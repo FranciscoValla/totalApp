@@ -105,6 +105,7 @@ export class CreateNote {
         fix: this.fix(),
         color: this.color(),
         img: this.imagenUrl(),
+        date: new Date(),
       };
       this.noteServices.createNoteFireStore(newNote).subscribe( ()=> {
         this.refreshNotes();

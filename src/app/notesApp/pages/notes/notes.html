@@ -10,7 +10,7 @@
   <h3 class="titleN mt-3">Notas Fijas</h3>
   <div class="row mt-2">
     @for (item of notesFix(); track item.id) {
-    <list-note class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3"
+    <list-note class="col-6 col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-3"
     [note]="item"
     (noteOutput)="isOpen($event)"
     (loadSignal)="load.set($event)"
@@ -24,7 +24,7 @@
   <h4 class="titleN mt-3">Notas Normales</h4>
   <div class="row mt-2">
     @for (item of notesNormal(); track item.id) {
-    <list-note class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3"
+    <list-note class="col-6 col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-3"
     [note]="item"
     (noteOutput)="isOpen($event)"
     (loadSignal)="load.set($event)"

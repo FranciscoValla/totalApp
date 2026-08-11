@@ -1,8 +1,8 @@
 :host {
   display: block !important;
   position: absolute;
-  top: -100%;     /* Se pega justo abajo del icono */
-  left: -100%;     /* Se alinea al centro del icono */
+  top: 100%;     /* Se pega justo abajo del icono */
+  left: 150%;     /* Se alinea al centro del icono */
   width: 0;
   height: 0;
   z-index: 1200;

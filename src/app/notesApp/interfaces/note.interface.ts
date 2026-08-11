@@ -4,5 +4,6 @@ export interface Note {
   content: string;
   fix: boolean;
   color: string;
+  date : Date;
   img?: string | null;
 }

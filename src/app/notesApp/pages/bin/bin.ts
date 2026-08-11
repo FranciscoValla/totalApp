@@ -39,7 +39,7 @@ export class Bin implements OnInit {
   });
   }
   binList = computed(() => {
-    return this.notervice.binList();
+    return this.notervice.binList().sort( (a,b) => new Date(a.date).getTime() - new Date(b.date).getTime() );
   });
 
   isOpen(note: Note) {

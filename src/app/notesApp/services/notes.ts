@@ -7,39 +7,7 @@ import { map, Observable, tap } from 'rxjs';
 @Service()
 export class NoteServices {
   public noteList = signal<Note[]>([]);
-  binList = signal<Note[]>([]);
-
-  updateNote(upN: Note) {
-    this.noteList.update((notes) =>
-      notes.map((note) =>
-        note.id == upN.id
-          ? {
-              ...note,
-              title: upN.title,
-              content: upN.content,
-              fix: upN.fix,
-              color: upN.color,
-              img: upN.img,
-            }
-          : note,
-      ),
-    );
-    console.log('UPDATE!!!, ', this.noteList());
-  }
-
-  deleteNote(id: string) {
-    this.noteList.update((notes) => notes.filter((note) => note.id !== id));
-  }
-
-  // --- Papelera ---
-
-  addBinList(newB: Note) {
-    this.binList.update((list) => [...list, newB]);
-  }
-
-  deleteBin(id: string) {
-    this.binList.update((bins) => bins.filter((bin) => bin.id !== id));
-  }
+  public binList = signal<Note[]>([]);
 
   deleteAllBin() {
     this.binList.set([]);
@@ -64,6 +32,7 @@ export class NoteServices {
             color: fields.color?.stringValue || 'bg-white',
             fix: fields.fix?.booleanValue || false,
             img: fields.img?.stringValue || null,
+            date: doc.fields.date?.timestampValue
           } as Note;
         });
       }),
@@ -73,14 +42,16 @@ export class NoteServices {
     );
   }
 
-  createNoteFireStore(nuevaNota: Note): Observable<Note> {
+  createNoteFireStore(newNote: Note): Observable<Note> {
+    console.log('>>>Nota', newNote);
     const bodyFirestore = {
       fields: {
-        title: { stringValue: nuevaNota.title || '' },
-        content: { stringValue: nuevaNota.content || '' },
-        color: { stringValue: nuevaNota.color || 'bg-white' },
-        fix: { booleanValue: nuevaNota.fix || false },
-        img: nuevaNota.img ? { stringValue: nuevaNota.img } : { nullValue: null },
+        title: { stringValue: newNote.title || '' },
+        content: { stringValue: newNote.content || '' },
+        color: { stringValue: newNote.color || 'bg-white' },
+        fix: { booleanValue: newNote.fix || false },
+        img: newNote.img ? { stringValue: newNote.img } : { nullValue: null },
+        date: { timestampValue: newNote.date.toISOString()||  new Date().toISOString() },
       },
     };
     return this.http.post<any>(`${this.baseUrl}/${this.noteCollection}`, bodyFirestore).pipe(
@@ -94,6 +65,7 @@ export class NoteServices {
           color: fields.color?.stringValue || 'bg-white',
           fix: fields.fix?.booleanValue || false,
           img: fields.img?.stringValue || null,
+          date: fields.date?.timestampValue || new Date().toISOString(),
         } as Note;
       }),
     );
@@ -144,6 +116,7 @@ export class NoteServices {
           color: fields.color?.stringValue || 'bg-white',
           fix: fields.fix?.booleanValue || false,
           img: fields.img?.stringValue || null,
+          date: fields.date?.timestampValue,
         } as Note;
       }),
     );
@@ -154,27 +127,33 @@ export class NoteServices {
     return this.http.delete<void>(urlConId);
   }
 
-  addListBinFireStore(noteBin: Note): Observable<Note> {
-    const bodyFireStore = {
+  addListBinFireStore( bin: Note): Observable<Note> {
+    console.log('>>>Bin', bin);
+    const fechaISO = bin.date instanceof Date
+      ? bin.date.toISOString()
+      : (typeof bin.date === 'string' ? bin.date : new Date().toISOString());
+    const bodyFirestore = {
       fields: {
-        title: { stringValue: noteBin.title || '' },
-        content: { stringValue: noteBin.content || '' },
-        color: { stringValue: noteBin.color || 'bg-white' },
-        fix: { booleanValue: noteBin.fix || false },
-        img: noteBin.img ? { stringValue: noteBin.img } : { nullValue: null },
+        title: { stringValue: bin.title || '' },
+        content: { stringValue: bin.content || '' },
+        color: { stringValue: bin.color || 'bg-white' },
+        fix: { booleanValue: bin.fix || false },
+        img: bin.img ? { stringValue: bin.img } : { nullValue: null },
+        date: { timestampValue: fechaISO },
       },
     };
-    return this.http.post<any>(`${this.baseUrl}/${this.binCollection}`, bodyFireStore).pipe(
+    return this.http.post<any>(`${this.baseUrl}/${this.binCollection}`, bodyFirestore).pipe(
       map((doc) => {
         const fields = doc.fields || {};
-        const idUnique = doc.name ? doc.name.split('/').pop() : '';
+        const idUnico = doc.name ? doc.name.split('/').pop() : '';
         return {
-          id: idUnique,
+          id: idUnico,
           title: fields.title?.stringValue || '',
           content: fields.content?.stringValue || '',
           color: fields.color?.stringValue || 'bg-white',
           fix: fields.fix?.booleanValue || false,
           img: fields.img?.stringValue || null,
+          date: fields.date?.timestampValue ? new Date(fields.date.timestampValue) : new Date(),
         } as Note;
       }),
     );
@@ -194,6 +173,7 @@ export class NoteServices {
             color: fields.color?.stringValue || 'bg-white',
             fix: fields.fix?.booleanValue || false,
             img: fields.img?.stringValue || null,
+            date: fields.date?.timestampValue,
           } as Note;
         });
       }),

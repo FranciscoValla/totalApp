@@ -45,11 +45,13 @@ export class Notes implements OnInit {
   }
 
   notesFix = computed(() => {
-    return this.noteServices.noteList().filter((note) => note.fix);
+  return this.noteServices.noteList().filter((note) => note.fix)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // <--- Ordena de más nueva a más vieja
   });
 
   notesNormal = computed(() => {
-    return this.noteServices.noteList().filter((note) => !note.fix);
+    return this.noteServices.noteList().filter((note) => !note.fix)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
 
   showAlert(alert: AlertInterface) {

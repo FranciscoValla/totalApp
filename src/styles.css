@@ -1,1 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+body.modal-abierto,
+body.modal-abierto html,
+body.modal-abierto app-root, /* Tu componente principal de Angular */
+body.modal-abierto .contenedor-principal-de-tu-app { /* Reemplaza por la clase de tu div con scroll si tienes uno */
+  overflow: hidden !important;
+  height: 100vh !important;
+  touch-action: none; /* Bloquea también el scroll táctil en celulares */
+}

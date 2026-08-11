@@ -1,9 +1,12 @@
 import {
   Component,
   computed,
+  DOCUMENT,
   inject,
   input,
   linkedSignal,
+  OnDestroy,
+  OnInit,
   output,
   signal,
 } from '@angular/core';
@@ -21,7 +24,7 @@ import { AlertInterface } from '../../pages/bin/bin';
   templateUrl: './modal-note.html',
   styleUrl: './modal-note.css',
 })
-export class ModalNote {
+export class ModalNote implements OnInit, OnDestroy {
   noteInput = input.required<Note>();
   noteCurrent = linkedSignal(() => ({ ...this.noteInput() }));
   emitClose = output();
@@ -46,6 +49,20 @@ export class ModalNote {
         return 'text-success-emphasis';
     }
   });
+
+  private document = inject(DOCUMENT);
+
+  // ... el resto de tus propiedades actuales (inputs, signals, computed)
+
+  // 🚀 Cuando el modal aparece en pantalla, congelamos el fondo
+  ngOnInit(): void {
+    this.document.body.classList.add('modal-abierto');
+  }
+
+  // 🚀 Cuando el modal se cierra (se destruye el componente), descongelamos el fondo
+  ngOnDestroy(): void {
+    this.document.body.classList.remove('modal-abierto');
+  }
 
   updateNoteFix() {
     this.noteCurrent.update((current) => ({
@@ -82,7 +99,6 @@ export class ModalNote {
   }
 
   deleteNote(id: string) {
-    this.noteServices.deleteNote(id);
     this.noteServices.deleteBinFirestore(id).subscribe({
       next: ()=> {
         this.addBin();
