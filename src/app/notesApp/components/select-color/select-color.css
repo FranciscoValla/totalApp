@@ -1,0 +1,26 @@
+:host {
+  display: block !important;
+  position: absolute;
+  top: -100%;     /* Se pega justo abajo del icono */
+  left: -100%;     /* Se alinea al centro del icono */
+  width: 0;
+  height: 0;
+  z-index: 1200;
+}
+
+/* 🌟 Centramos el recuadro de dos filas exactamente debajo de la paleta */
+.recuadro-paleta {
+  transform: translateX(-50%); /* Desplaza el menú hacia la izquierda la mitad de su propio ancho para centrarlo */
+}
+
+.selectC {
+  width: 25px !important;
+  height: 25px !important;
+  border-radius: 50%;
+}
+
+
+.colorActivo {
+  transform: scale(1.25); /* Lo hace notar notablemente más grande */
+  box-shadow: 0 0 0 3px #ffffff, 0 0 8px 3px rgba(0, 0, 0, 0.35) !important;
+}

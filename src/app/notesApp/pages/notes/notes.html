@@ -1,0 +1,56 @@
+<div class="container" [class.d-none]="load()">
+  <div class="row justify-content-md-center">
+    <create-note class="col-12 col-md-8 col-lg-6 mb-3"
+    (alertEmit)="showAlert($event)"
+    (loadSignal)="load.set($event)"
+    ></create-note>
+  </div>
+
+  @if ( notesFix().length > 0) {
+  <h3 class="titleN mt-3">Notas Fijas</h3>
+  <div class="row mt-2">
+    @for (item of notesFix(); track item.id) {
+    <list-note class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3"
+    [note]="item"
+    (noteOutput)="isOpen($event)"
+    (loadSignal)="load.set($event)"
+    (alertEmit)="showAlert($event)">
+    </list-note>
+    }
+  </div>
+  }
+
+  @if ( notesNormal().length > 0) {
+  <h4 class="titleN mt-3">Notas Normales</h4>
+  <div class="row mt-2">
+    @for (item of notesNormal(); track item.id) {
+    <list-note class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3"
+    [note]="item"
+    (noteOutput)="isOpen($event)"
+    (loadSignal)="load.set($event)"
+    (alertEmit)="showAlert($event)">
+    </list-note>
+    }
+  </div>
+  }
+
+  @if (isShowAlert()) {
+  <div class="p-3 mb-2 rounded bg-warning text-dark position-fixed bottom-0 end-0 mr-5">Nota vacía, no se creo.</div>
+  }
+
+</div>
+
+@if (alertShow()) {
+  <div class="p-3 mb-2 rounded position-fixed bottom-0 end-0 mr-5 {{alert().type}}"
+  [class.text-white]="alert().type !== 'bg-warning' ">{{alert().txt}}</div>
+}
+
+<div class="spinner-border position-absolute top-50 start-50" [class.d-none]="!load()" style="width: 5rem; height: 5rem;" role="status">
+  <span class="visually-hidden ">Loading...</span>
+</div>
+
+<!-- Simplificado: Eliminamos el @if estructural -->
+@if ( showModal() && noteModal();) {
+<modal-note [noteInput]="noteModal()!" (emitClose)="showModal.set(false);
+noteModal.set(null);" class="position-absolute top-50 start-50"></modal-note>
+}

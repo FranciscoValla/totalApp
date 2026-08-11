@@ -1,0 +1,49 @@
+<div class="new-note border border-secondary-subtle rounded p-2 shadow {{color()}} w-100 m-4">
+  @if (isExpanded()) {
+  <div class="row">
+    @if(isExpanded() && imagenUrl()) {
+      <div class="col-12">
+        <img [src]="imagenUrl()" class="w-100 rounded img-base">
+      </div>
+    }
+    <div class="col-11">
+      <textarea type="text" placeholder="Titulo..." style="font-size: 24px !important;" [(ngModel)]="title"
+        class="w-100 {{textcolor()}}" rows="1"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Escribe para Añadir el Título"> </textarea>
+    </div>
+  </div>
+  }
+  <textarea type="text" placeholder="Añade una nota..." class="w-100 {{textcolor()}}" [rows]="isExpanded() ? 3 : 1"
+    (focus)="isExpanded.set(true)" [(ngModel)]="content"
+    data-bs-toggle="tooltip" data-bs-placement="top"  title="Escribe para Crear Nota"></textarea>
+  @if (isExpanded()) {
+  <div class="text-end mb-0">
+    <div class="row px-4">
+      <div class="col-1 position-relative">
+        <i class="fa-solid fa-palette rounded {{textcolor()}}" (click)="isShowSelectColor.set(true)"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Cambiar Color Fondo">
+        </i>
+        @if (isShowSelectColor()) {
+        <select-color (hideSelect)="isShowSelectColor.set(false)" (colorSelectOutput)="color.set($event)"
+          [colorInput]="color()"></select-color>
+        }
+      </div>
+      <div class="col-1">
+        <i class="fa-solid {{textcolor()}}" [ngClass]="fix() ? 'fa-thumbtack' : 'fa-thumbtack-slash'"
+          style="font-size: 18px; cursor: pointer;" (click)="fix.set(!fix())"
+          data-bs-toggle="tooltip" data-bs-placement="top"  title="Fijar/DesFijar Nota"></i>
+      </div>
+      <div class="col-1 justify-content-center">
+        <label for="seleccionar-imagen" class="icono-carga-contenedor m-0"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Agregar Imagen">
+          <i class="fa-solid fa-image {{textcolor()}}" style="cursor: pointer; font-size: 18px;"></i>
+        </label>
+        <input type="file" id="seleccionar-imagen" class="d-none" accept="image/*" (change)="onFileSelected($event)">
+      </div>
+      <div class="col-8 text-end">
+        <span (click)="createNote()" style="cursor: pointer;" class="{{textcolor()}}">Crear Nota</span>
+      </div>
+    </div>
+  </div>
+  }
+</div>

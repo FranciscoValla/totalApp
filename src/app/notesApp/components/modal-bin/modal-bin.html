@@ -1,0 +1,33 @@
+<div class="custom-modal-overlay" (click)="onClose()">
+
+
+  <div class="card border border-0 rounded p-0 shadow" [ngClass]="binInput().color"
+    (click)="$event.stopPropagation()">
+    <div class="card-header align-items-center p-2 {{textColor()}}"
+      style="cursor: p; font-size: 24px !important; font-weight: 600;">
+      @if(binInput().img) {
+      <div class="col-12">
+        <img [src]="binInput().img" class="w-100 rounded img-base">
+      </div>
+      }
+      <textarea type="text" placeholder="Titulo..." style="font-size: 24px;" [(ngModel)]="binInput().title"
+        class="w-100 {{textColor()}}" rows="1"> </textarea>
+    </div>
+    <div class="card-body pt-0 p-2" style="cursor: p;">
+      <textarea type="text" placeholder="Añade una nota..." style="font-size: 16px;" class="w-100 {{textColor()}}"
+        [rows]="5" [(ngModel)]="binInput().content"></textarea>
+    </div>
+    <div class="position-relative card-footer text-end">
+      <div class="row px-2">
+        <div class="col-1 position-relative">
+          <i class="fa-solid fa-trash {{textColor()}}" style="cursor: pointer; font-size: 16px !important;"
+        (click)="$event.stopPropagation(); isRestored.set(false); deleteBin(binInput());"></i>
+        </div>
+        <div class="col-1">
+          <i class="fa-solid fa-trash-can-arrow-up {{textColor()}}"
+          (click)="$event.stopPropagation(); isRestored.set(true); deleteBin(binInput());"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

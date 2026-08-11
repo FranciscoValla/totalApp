@@ -1,0 +1,73 @@
+/* Fondo oscuro translúcido que cubre toda la pantalla */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* Por encima de todo */
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { background-color: rgba(0, 0, 0, 0); }
+  to { background-color: rgba(0, 0, 0, 0.5); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- Formulario update Note --- */
+.card {
+  width: 70% !important;
+}
+
+.card-body, .card-header, .card-footer {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.card textarea {
+  border: none;
+  background: none;
+  box-shadow: none;
+  outline: none;
+  resize: none;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.new-note p {
+  color: crimson;
+  font-size: 16px;
+  display: inline-block !important;
+  text-align: end !important;
+  padding: 0px 16px;
+}
+
+.new-note p:hover {
+  border-end-end-radius: 20px;
+  border-start-end-radius: 20px;
+  background-color: rgba(220, 20, 60, 0.8) !important;
+  color: #000;
+}
+
+
+/* --- imagen preview ---  */
+.img-base {
+  max-height: 350px;
+  overflow: hidden;
+  background-color: transparent;
+  object-fit: contain;
+}

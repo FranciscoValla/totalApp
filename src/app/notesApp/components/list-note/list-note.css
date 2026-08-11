@@ -1,0 +1,27 @@
+/* * {
+  font-family: 'Inter', sans-serif;
+} */
+.card-header, .card-text {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  font-weight: 500 !important;
+}
+
+
+.card-body, .card-header, .card-footer {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.card-footer i:hover {
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--bs-secondary-bg-subtle) 50%, transparent) !important;
+}
+
+/* --- img --- */
+.img-base {
+  max-height: 160px !important;
+  overflow: hidden;
+  background-color: transparent;
+  object-fit: contain;
+}

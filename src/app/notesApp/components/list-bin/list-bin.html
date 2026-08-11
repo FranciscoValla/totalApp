@@ -1,0 +1,19 @@
+<div class="card border border-secondary-subtle rounded p-0 shadow" [ngClass]="bin().color">
+  <div class="card-header align-items-center p-2 {{textColor()}}"
+    style="cursor: p; font-size: 24px !important; font-weight: 600;" (click)="onEmit()">
+    @if(bin().img) {
+      <div class="col-12">
+        <img [src]="bin().img" class="w-100 rounded img-base">
+      </div>
+    }
+    {{bin().title}}
+  </div>
+  <div class="card-body pt-0 p-2" style="cursor: p;" (click)="onEmit()">
+    <p class="card-text {{textColor()}}">{{bin().content}}</p>
+  </div>
+  <div class="card-footer d-flex p-2 px-4">
+    <i class="fa-solid fa-trash {{textColor()}}" style="cursor: pointer; font-size: 16px !important;"
+      (click)="$event.stopPropagation();isrestored.set(false); deleteBin(bin());"></i>
+    <i class="fa-solid fa-trash-can-arrow-up {{textColor()}}" (click)="$event.stopPropagation(); isrestored.set(true); deleteBin(bin());"></i>
+  </div>
+</div>

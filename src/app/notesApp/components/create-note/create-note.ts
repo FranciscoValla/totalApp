@@ -1,0 +1,164 @@
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  signal,
+  computed,
+  output,
+  afterNextRender,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { NoteServices } from '../../services/notes';
+import { Note } from '../../interfaces/note.interface';
+import { NgClass } from '@angular/common';
+import { SelectColor } from '../select-color/select-color';
+import { AlertInterface } from '../../pages/bin/bin';
+import { CompressImage } from '../../services/compress-image';
+declare var bootstrap: any;
+
+@Component({
+  selector: 'create-note',
+  imports: [FormsModule, NgClass, SelectColor],
+  templateUrl: './create-note.html',
+  styleUrl: './create-note.css',
+})
+export class CreateNote {
+  noteServices = inject(NoteServices);
+  iComprService = inject(CompressImage);
+  private elementRef = inject(ElementRef);
+
+  isExpanded = signal(false);
+  isShowSelectColor = signal(false);
+
+  loadSignal = output<boolean>();
+  alertEmit = output<AlertInterface>();
+  imagenUrl = signal<string | null>(null);
+
+  title = signal('');
+  content = signal('');
+  fix = signal(false);
+  color = signal('bg-white');
+  textcolor = computed(() => {
+    switch (this.color()) {
+      case 'bg-primary':
+      case 'bg-secondary':
+      case 'bg-success':
+      case 'bg-danger':
+      case 'bg-dark':
+        return 'text-white';
+
+      case 'bg-white':
+      case 'bg-warning':
+      case 'bg-info':
+        return 'text-success-emphasis';
+      default:
+        return 'text-success-emphasis';
+    }
+  });
+
+  constructor() {
+    // 2. Ejecutar la inicialización segura solo en el cliente/navegador
+    afterNextRender(() => {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      tooltipTriggerList.forEach(tooltipTriggerEl => {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onclickOutside(event: MouseEvent) {
+    const clickedInside = this.elementRef.nativeElement.contains(event.target);
+    if (!clickedInside) {
+      if (this.title().trim().length === 0 && this.content().trim().length === 0) {
+        this.isExpanded.set(false);
+        this.fix.set(false);
+        this.imagenUrl.set(null);
+      } else {
+        this.createNote();
+      }
+      this.color.set('bg-white');
+    }
+  }
+
+  createNote() {
+    if (
+      this.title().trim().length === 0 &&
+      this.content().trim().length === 0 &&
+      this.imagenUrl() === null
+    ) {
+      this.isExpanded.set(false);
+      this.fix.set(false);
+      this.color.set('bg-white');
+      this.imagenUrl.set(null);
+      this.alertEmit.emit({
+        type: 'bg-warning',
+        txt: 'Nota vacía. No se creó la Nota.',
+      });
+    } else {
+      this.loadSignal.emit(true);
+      const newNote: Note = {
+        id: Math.random().toString(36).substring(2, 8).toUpperCase(),
+        title: this.title(),
+        content: this.content(),
+        fix: this.fix(),
+        color: this.color(),
+        img: this.imagenUrl(),
+      };
+      this.noteServices.createNoteFireStore(newNote).subscribe( ()=> {
+        this.refreshNotes();
+        this.isExpanded.set(false);
+        this.title.set('');
+        this.content.set('');
+        this.fix.set(false);
+        this.imagenUrl.set(null);
+        this.color.set('bg-white');
+
+      }, () => {
+        this.alertEmit.emit({
+          type: 'bg-bg-danger',
+          txt: 'Error al guardar la Nota. No se creó la Nota.',
+        });
+        this.isExpanded.set(false);
+        this.title.set('');
+        this.content.set('');
+        this.fix.set(false);
+        this.imagenUrl.set(null);
+        this.color.set('bg-white');
+      });
+    }
+  }
+
+  refreshNotes() {
+    this.noteServices.getNotesFireStore().subscribe( ()=> {
+      this.alertEmit.emit({
+        type: 'bg-success',
+        txt: 'Nota Creada.',
+      });
+      this.loadSignal.emit(false);
+    }, () => {
+      this.alertEmit.emit({
+          type: 'bg-bg-danger',
+          txt: 'Error al cargar notas.',
+        });
+      this.loadSignal.emit(false);
+    })
+  }
+
+  async onFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      try {
+        const imageCompressBase64 = await this.iComprService.compressFile(file, 1200, 0.4);
+        this.imagenUrl.set(imageCompressBase64);
+      } catch {
+        this.alertEmit.emit({
+          type: 'bg-bg-danger',
+          txt: 'Error al guardar la imagen',
+        });
+      }
+    }
+  }
+}

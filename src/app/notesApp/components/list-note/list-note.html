@@ -1,0 +1,39 @@
+<div class="card border border-secondary-subtle rounded p-0 shadow" [ngClass]="note().color">
+  <div class="card-header align-items-center p-2 {{textColor()}}"
+    style="cursor: p; font-size: 24px !important; font-weight: 600;" (click)="onEmit()">
+    @if(note().img) {
+      <div class="col-12">
+        <img [src]="note().img" class="w-100 rounded img-base">
+      </div>
+    }
+    {{note().title}}
+  </div>
+  <div class="card-body pt-0 p-2" style="cursor: p;" (click)="onEmit()">
+    <p class="card-text {{textColor()}}">{{note().content}}</p>
+  </div>
+  <div class="position-relative card-footer text-end mb-0">
+    <div class="row px-2">
+      <div class="col-2 position-relative">
+        <i class="fa-solid fa-palette {{textColor()}} p-2" (click)="isShowSelectColor.set(true)"></i>
+        @if (isShowSelectColor()) {
+        <select-color (hideSelect)="isShowSelectColor.set(false)" (colorSelectOutput)="changeColor($event)"
+          [colorInput]="note().color!"></select-color>
+        }
+      </div>
+      <div class="col-2">
+        <i class="fa-solid {{textColor()}} p-2" [ngClass]="note().fix ? 'fa-thumbtack' : 'fa-thumbtack-slash'"
+        (click)=" updateNoteFix();"></i>
+      </div>
+      <div class="col-2 justify-content-center">
+        <label for="seleccionar-imagen" class="icono-carga-contenedor m-0">
+          <i class="fa-solid fa-image {{textColor()}} p-2" style="cursor: pointer; font-size: 18px;"></i>
+        </label>
+        <input type="file" id="seleccionar-imagen" class="d-none" accept="image/*" (change)="onFileSelected($event)">
+      </div>
+      <div class="col-6 text-end">
+        <i class="fa-solid fa-trash {{textColor()}} p-2" style="cursor: pointer; font-size: 16px !important;"
+        (click)="$event.stopPropagation(); deleteNote(note().id);"></i>
+      </div>
+    </div>
+  </div>
+</div>
