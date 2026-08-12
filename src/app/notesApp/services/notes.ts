@@ -44,6 +44,9 @@ export class NoteServices {
 
   createNoteFireStore(newNote: Note): Observable<Note> {
     console.log('>>>Nota', newNote);
+    const fechaISO = newNote.date instanceof Date
+      ? newNote.date.toISOString()
+      : (typeof newNote.date === 'string' ? newNote.date : new Date().toISOString());
     const bodyFirestore = {
       fields: {
         title: { stringValue: newNote.title || '' },
@@ -51,7 +54,7 @@ export class NoteServices {
         color: { stringValue: newNote.color || 'bg-white' },
         fix: { booleanValue: newNote.fix || false },
         img: newNote.img ? { stringValue: newNote.img } : { nullValue: null },
-        date: { timestampValue: newNote.date.toISOString()||  new Date().toISOString() },
+        date: { timestampValue: fechaISO },
       },
     };
     return this.http.post<any>(`${this.baseUrl}/${this.noteCollection}`, bodyFirestore).pipe(

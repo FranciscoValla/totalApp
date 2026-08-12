@@ -17,6 +17,7 @@ import { NgClass } from '@angular/common';
 import { SelectColor } from '../select-color/select-color';
 import { CompressImage } from '../../services/compress-image';
 import { AlertInterface } from '../../pages/bin/bin';
+import { finalize, timeout } from 'rxjs';
 
 @Component({
   selector: 'modal-note',
@@ -86,11 +87,10 @@ export class ModalNote implements OnInit, OnDestroy {
       const file = inputElement.files[0];
       try {
         const imageCompressBase64 = await this.iCompService.compressFile(file, 1200, 0.4);
-        const copiaActual = this.noteCurrent();
-        this.noteCurrent.set({
-          ...copiaActual,
-          img: imageCompressBase64,
-        });
+        this.noteCurrent.update((current) => ({
+        ...current,
+        img: imageCompressBase64,
+      }));
       } catch {
 
       }
@@ -99,31 +99,30 @@ export class ModalNote implements OnInit, OnDestroy {
   }
 
   deleteNote(id: string) {
-    this.noteServices.deleteBinFirestore(id).subscribe({
-      next: ()=> {
-        this.addBin();
-      },
-      error: ()=> {
-        this.emitingAlert('bg-danger', 'Error al Borrar Nota')
-        this.emitClose.emit();
-      }
-    })
-    this.emitClose.emit();
-  }
+      this.noteServices.deleteNoteFireStore(id).pipe(
+        timeout(6000),
+        finalize(() => {}),
+      ).subscribe({
+        next: () => this.addBin(),
+        error: (err) => {
+          this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.');
+          this.onClose();
+        },
+      });
+    }
 
-  addBin() {
-    this.noteServices.addListBinFireStore(this.noteCurrent()).subscribe({
-      next: ()=> {
-        this.emitingAlert('bg-danger', 'Nota Borrada Correctamente.');
-        this.emitClose.emit();
-      },
-      error: ()=> {
-        this.emitingAlert('bg-danger', 'error al Borrar Nota.');
-        this.emitClose.emit();
-      }
-    });
-    this.emitClose.emit();
-  }
+    addBin() {
+      this.noteServices.addListBinFireStore(this.noteInput()).pipe(
+        timeout(6000),
+        finalize(() => {}),
+      ).subscribe({
+        next: () => this.refreshNotes('bg-warning', 'Nota Borrada. Se Manda a Papelera.'),
+        error: () => {
+          this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.');
+          this.onClose();
+        }
+      });
+    }
 
   onClose() {
     const originalNote = this.noteInput();
@@ -179,9 +178,12 @@ export class ModalNote implements OnInit, OnDestroy {
     this.noteServices.getNotesFireStore().subscribe({
       next: () => {
         this.emitingAlert(type, txt);
+        // this.onClose()
+        this.emitClose.emit();
       },
       error: () => {
         this.emitingAlert('bg-bg-danger', 'Error al Actualizar la Nota.');
+        this.onClose();
       },
     });
   }

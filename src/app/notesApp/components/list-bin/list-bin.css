@@ -1,36 +1,17 @@
-/* * {
-  font-family: 'Inter', sans-serif;
-} */
 .card-header, .card-text {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 500 !important;
 }
+
 
 .card-body, .card-header, .card-footer {
   background-color: transparent !important;
   border: none !important;
 }
 
-.card-footer i {
-  display: inline-flex;          /* Convierte a flex para centrar el icono dentro de su zona */
-  align-items: center;
-  justify-content: center;
-  width: 36px !important;                  /* Fijamos un tamaño de contenedor circular idéntico a Google Keep */
-  height: 36px !important;
-  border-radius: 50%;           /* Hace que el fondo/iluminación sea completamente redondo */
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Transición suave y profesional */
-  margin-right: 10px;
-}
-
-.card-footer i:hover {
-  background-color: rgba(24, 5, 5, 0.2) !important; /* Añade un fondo blanco traslúcido sutil */
-
-  /* Box Shadow: Desplazamiento X=0, Y=0, Difuminado=12px, Expansión=4px con un blanco brillante */
-  box-shadow: 0 0 12px 4px rgba(255, 255, 255, 0.8) !important;
-
-  transform: scale(1.1); /* Agranda el icono sutilmente en lugar de usar padding tosco */
+.card-footer .col-2:hover {
+  background-color: color-mix(in srgb, var(--bs-secondary-bg-subtle) 50%, transparent) !important;
 }
 
 /* --- img --- */

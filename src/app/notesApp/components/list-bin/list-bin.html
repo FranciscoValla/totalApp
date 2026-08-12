@@ -11,9 +11,17 @@
   <div class="card-body pt-0 p-2" style="cursor: p;" (click)="onEmit()">
     <p class="card-text {{textColor()}}">{{bin().content}}</p>
   </div>
-  <div class="card-footer d-flex p-2 px-4">
-    <i class="fa-solid fa-trash {{textColor()}}" style="cursor: pointer; font-size: 16px !important;"
-      (click)="$event.stopPropagation();isrestored.set(false); deleteBin(bin());"></i>
-    <i class="fa-solid fa-trash-can-arrow-up {{textColor()}}" (click)="$event.stopPropagation(); isrestored.set(true); deleteBin(bin());"></i>
+  <div class="position-relative card-footer mb-0">
+    <div class="row px-2">
+      <div class="col-2 py-1 d-flex justify-content-center align-items-center position-relative rounded"
+      (click)="$event.stopPropagation(); isrestored.set(false); deleteBin(bin());" style="cursor: pointer;"
+      data-bs-toggle="tooltip" data-bs-placement="top"  title="Borrar Nota Permanentemente">
+        <i class="fa-solid fa-trash {{textColor()}}" style="font-size: 16px !important;"></i>
+      </div>
+      <div class="col-2 py-1 d-flex justify-content-center align-items-center position-relative rounded"
+       (click)="$event.stopPropagation(); isrestored.set(true); deleteBin(bin());" style="cursor: pointer;"
+       data-bs-toggle="tooltip" data-bs-placement="top"  title="Restaurar Nota">
+        <i class="fa-solid fa-trash-can-arrow-up {{textColor()}}"></i></div>
+    </div>
   </div>
 </div>

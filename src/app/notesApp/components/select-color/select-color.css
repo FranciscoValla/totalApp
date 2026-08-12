@@ -2,7 +2,7 @@
   display: block !important;
   position: absolute;
   top: 100%;     /* Se pega justo abajo del icono */
-  left: 150%;     /* Se alinea al centro del icono */
+  left: 200%;     /* Se alinea al centro del icono */
   width: 0;
   height: 0;
   z-index: 1200;
@@ -14,9 +14,10 @@
 }
 
 .selectC {
-  width: 25px !important;
-  height: 25px !important;
-  border-radius: 50%;
+  display: inline-block !important;
+  width: 20%;
+  margin: 2px;
+  height: 20px !important;
 }
 
 

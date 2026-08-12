@@ -6,7 +6,8 @@ import {
   signal,
   computed,
   output,
-  afterNextRender,
+  viewChildren,
+  effect,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NoteServices } from '../../services/notes';
@@ -29,6 +30,10 @@ export class CreateNote {
   private elementRef = inject(ElementRef);
 
   isExpanded = signal(false);
+  isList = signal(false);
+  listNote = signal<string[]>([]);
+  showListButton = signal(true);
+  elementosInput = viewChildren<ElementRef<HTMLInputElement>>('notaInput');
   isShowSelectColor = signal(false);
 
   loadSignal = output<boolean>();
@@ -58,12 +63,15 @@ export class CreateNote {
   });
 
   constructor() {
-    // 2. Ejecutar la inicialización segura solo en el cliente/navegador
-    afterNextRender(() => {
-      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-      tooltipTriggerList.forEach(tooltipTriggerEl => {
-        new bootstrap.Tooltip(tooltipTriggerEl);
-      });
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    effect(() => {
+      const inputs = this.elementosInput();
+      if (inputs.length > 0) {
+        // Tomamos el último input renderizado en pantalla y le damos foco
+        const ultimoInput = inputs[inputs.length - 1].nativeElement;
+        ultimoInput.focus();
+      }
     });
   }
 
@@ -75,6 +83,9 @@ export class CreateNote {
         this.isExpanded.set(false);
         this.fix.set(false);
         this.imagenUrl.set(null);
+        this.isList.set(false);
+        this.listNote.set([]);
+        this.showListButton.set(true);
       } else {
         this.createNote();
       }
@@ -82,6 +93,23 @@ export class CreateNote {
     }
   }
 
+  onEnter(event: Event, index: number) {
+    event.preventDefault();
+    this.listNote.update(lista => [...lista, '']);
+    console.log('Asi va quedando la lista:', this.listNote())
+    setTimeout(() => {
+      const inputs = this.elementosInput();
+      if (inputs.length > 0) {
+        inputs[inputs.length - 1].nativeElement.focus();
+      }
+    }, 10);
+  }
+
+  deleteliList (indexDelete:number) {
+    this.listNote.update( li =>
+      li.filter( (_item,index) => index !== indexDelete )
+    );
+  }
   createNote() {
     if (
       this.title().trim().length === 0 &&
@@ -92,6 +120,7 @@ export class CreateNote {
       this.fix.set(false);
       this.color.set('bg-white');
       this.imagenUrl.set(null);
+      this.showListButton.set(true);
       this.alertEmit.emit({
         type: 'bg-warning',
         txt: 'Nota vacía. No se creó la Nota.',
@@ -115,7 +144,7 @@ export class CreateNote {
         this.fix.set(false);
         this.imagenUrl.set(null);
         this.color.set('bg-white');
-
+        this.showListButton.set(true);
       }, () => {
         this.alertEmit.emit({
           type: 'bg-bg-danger',

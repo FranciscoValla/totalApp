@@ -1,46 +1,58 @@
 <div class="custom-modal-overlay" (click)="onClose()">
   <div class="card border border-0 rounded p-0 shadow" [ngClass]="noteCurrent().color"
     (click)="$event.stopPropagation()">
+
     <div class="card-header align-items-center p-2 {{textColor()}}"
-      style="cursor: p; font-size: 24px !important; font-weight: 600;">
+      style="cursor: pointer; font-size: 24px !important; font-weight: 600;">
       @if(noteCurrent().img) {
       <div class="col-12">
         <img [src]="noteCurrent().img" class="w-100 rounded img-base">
       </div>
       }
       <textarea type="text" placeholder="Titulo..." style="font-size: 24px;" [(ngModel)]="noteCurrent().title"
-        class="w-100 {{textColor()}}" rows="1"> </textarea>
+        class="col-12 {{textColor()}}" rows="1"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Escribe para cambiar el título"> </textarea>
     </div>
-    <div class="card-body pt-0 p-2" style="cursor: p;">
+
+    <div class="card-body pt-0 p-2" style="cursor: pointer;">
       <textarea type="text" placeholder="Añade una nota..." style="font-size: 16px;" class="w-100 {{textColor()}}"
-        [rows]="5" [(ngModel)]="noteCurrent().content"></textarea>
+        [rows]="5" [(ngModel)]="noteCurrent().content"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Escribe para cambiar la Nota"></textarea>
     </div>
+
     <div class="position-relative card-footer text-end">
       <div class="row px-2">
-        <div class="col-1 position-relative">
-          <i class="fa-solid fa-palette {{textColor()}} p-2" (click)="isShowSelectColor.set(true)"></i>
+        <!-- 1. Botón Paleta (El click se queda en el icono) -->
+        <div class="col-2 col-md-1 d-flex justify-content-center align-items-center position-relative rounded"
+        (click)="isShowSelectColor.set(true)" style="cursor: pointer;"
+            data-bs-toggle="tooltip" data-bs-placement="top"  title="Cambiar Color Fondo">
+          <i class="fa-solid fa-palette {{textColor()}} p-2"></i>
           @if (isShowSelectColor()) {
           <select-color (hideSelect)="isShowSelectColor.set(false)" (colorSelectOutput)="updateColor($event)"
             [colorInput]="noteCurrent().color!"></select-color>
           }
         </div>
-        <div class="col-1">
-          <i class="fa-solid {{textColor()}} p-2" [ngClass]="noteCurrent().fix ? 'fa-thumbtack' : 'fa-thumbtack-slash'"
-            (click)=" updateNoteFix();"></i>
+        <!-- 2. Botón Fijar (El click se queda en el icono) -->
+        <div class="col-2 col-md-1 d-flex justify-content-center align-items-center rounded"
+        (click)="updateNoteFix();" style="cursor: pointer;"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Fijar/DesFijar Nota">
+          <i class="fa-solid {{textColor()}} p-2"
+            [ngClass]="noteCurrent().fix ? 'fa-thumbtack' : 'fa-thumbtack-slash'"></i>
         </div>
-        <div class="col-1 justify-content-center position-relative d-inline-block">
-          <i class="fa-solid fa-image {{textColor()}} p-2" style="cursor: pointer; font-size: 16px !important;"></i>
-          <input type="file" id="seleccionar-imagen"
-          class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
-          accept="image/*"
-          style="cursor: pointer;"
-          (click)="$event.stopPropagation()"
-          (change)="$event.stopPropagation();
-          onFileSelected($event)" />
+        <!-- 3. Botón Imagen (Tu truco original adaptado a las columnas nuevas) -->
+        <div class="col-2 col-md-1 d-flex justify-content-center align-items-center position-relative rounded"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Cambiar/Agregar Imagen"
+          style="overflow: hidden;">
+          <i class="fa-solid fa-image {{textColor()}} p-2" style="cursor: pointer; font-size: 18px;"></i>
+          <input type="file" id="seleccionar-imagen" class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+            accept="image/*" style="cursor: pointer;" (click)="$event.stopPropagation()"
+            (change)="$event.stopPropagation(); onFileSelected($event)" />
         </div>
-        <div class="col-8 text-end">
-          <i class="fa-solid fa-trash {{textColor()}} p-2" style="cursor: pointer; font-size: 16px !important;"
-            (click)="$event.stopPropagation(); deleteNote(noteCurrent().id);"></i>
+        <!-- 4. Botón Basura -->
+        <div class="offset-4 col-2 offset-md-8 col-md-1 d-flex justify-content-center align-items-center rounded"
+        (click)="$event.stopPropagation(); deleteNote(noteCurrent().id);" style="cursor: pointer;"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Borrar Nota">
+          <i class="fa-solid fa-trash {{textColor()}} p-2" style="cursor: pointer; font-size: 16px !important;"></i>
         </div>
       </div>
     </div>

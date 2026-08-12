@@ -1,9 +1,9 @@
-<div class="position-absolute p-2 rounded bg-white shadow z-3 recuadro-paleta" style="width: 190px !important;">
-  <div class="row justify-content-start">
+<div class="position-absolute bg-white shadow z-3 recuadro-paleta" style="width: 150px !important;">
+  <div class="row justify-content-center position-relative p-1">
     @for (item of listadoColores; track $index) {
-      <div class="col-auto pt-1">
-        <div (click)="colorSelecionado.set(item.bg); changueColor();"
-        class="selectC {{item.bg}} {{item.border}}" [class.colorActivo]="colorSelecionado() === item.bg"></div>
+      <div class="selectC {{item.bg}} {{item.border}}"
+      (click)="colorSelecionado.set(item.bg); changueColor();"
+      [class.colorActivo]="colorSelecionado() === item.bg">
       </div>
     }
   </div>

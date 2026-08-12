@@ -19,13 +19,15 @@
     </div>
     <div class="position-relative card-footer text-end">
       <div class="row px-2">
-        <div class="col-1 position-relative">
-          <i class="fa-solid fa-trash {{textColor()}}" style="cursor: pointer; font-size: 16px !important;"
-        (click)="$event.stopPropagation(); isRestored.set(false); deleteBin(binInput());"></i>
+        <div class="py-1 col-2 col-md-1 d-flex justify-content-center align-items-center rounded"
+        (click)="$event.stopPropagation(); isRestored.set(false); deleteBin(binInput());"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Borrar Nota Permanentemente">
+          <i class="fa-solid fa-trash {{textColor()}}" style="cursor: pointer; font-size: 16px !important;"></i>
         </div>
-        <div class="col-1">
-          <i class="fa-solid fa-trash-can-arrow-up {{textColor()}}"
-          (click)="$event.stopPropagation(); isRestored.set(true); deleteBin(binInput());"></i>
+        <div class="py-1 col-2 col-md-1 d-flex justify-content-center align-items-center rounded"
+        (click)="$event.stopPropagation(); isRestored.set(true); deleteBin(binInput());"
+        data-bs-toggle="tooltip" data-bs-placement="top"  title="Restaurar Nota">
+          <i class="fa-solid fa-trash-can-arrow-up {{textColor()}}"></i>
         </div>
       </div>
     </div>

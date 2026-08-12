@@ -44,19 +44,16 @@ export class ListNote {
 
   deleteNote(id: string) {
     this.loadSignal.emit(true);
-    this.noteServices
-      .deleteNoteFireStore(id)
-      .pipe(
-        timeout(6000),
-        finalize(() => {}),
-      )
-      .subscribe({
-        next: () => this.addBin(),
-        error: (err) => {
-          this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.')
-          this.loadSignal.emit(false);
-        },
-      });
+    this.noteServices.deleteNoteFireStore(id).pipe(
+      timeout(6000),
+      finalize(() => {}),
+    ).subscribe({
+      next: () => this.addBin(),
+      error: (err) => {
+        this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.')
+        this.loadSignal.emit(false);
+      },
+    });
   }
 
   addBin() {
