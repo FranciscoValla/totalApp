@@ -2,7 +2,7 @@
   display: block !important;
   position: absolute;
   top: 100%;     /* Se pega justo abajo del icono */
-  left: 200%;     /* Se alinea al centro del icono */
+  left: 240%;     /* Se alinea al centro del icono */
   width: 0;
   height: 0;
   z-index: 1200;

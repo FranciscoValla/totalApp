@@ -30,7 +30,7 @@ export class Notes implements OnInit {
     this.load.set(true);
     this.noteServices.getNotesFireStore().subscribe({
       next: () => this.load.set(false),
-      error: () => {
+      error: (err) => {
         this.showAlert({
           type: 'bg-danger',
           txt: 'Erorr al Obtener las Notas.',

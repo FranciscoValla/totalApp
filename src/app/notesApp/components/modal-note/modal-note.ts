@@ -156,7 +156,6 @@ export class ModalNote implements OnInit, OnDestroy {
     }
 
     if( isUpload() ) {
-      console.log('Entra en IsUpload')
       this.noteServices.updateNoteFireStore(this.noteInput().id, update).subscribe({
         next: ()=> {
           this.refreshNotes('bg-success', 'Nota Actualizada Correctamente.');

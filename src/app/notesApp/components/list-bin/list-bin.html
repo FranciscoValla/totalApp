@@ -9,7 +9,17 @@
     {{bin().title}}
   </div>
   <div class="card-body pt-0 p-2" style="cursor: p;" (click)="onEmit()">
-    <p class="card-text {{textColor()}}">{{bin().content}}</p>
+     @if ( !isArray()) {
+      <p class="card-text {{textColor()}}">{{bin().content}}</p>
+    } @else {
+      <ul class="card-text {{textColor()}} p-0 m-0 list-unstyled">
+        @for (item of bin().content; track $index) {
+          <li class="p-0 m-0">
+            {{item}}
+          </li>
+        }
+      </ul>
+    }
   </div>
   <div class="position-relative card-footer mb-0">
     <div class="row px-2">

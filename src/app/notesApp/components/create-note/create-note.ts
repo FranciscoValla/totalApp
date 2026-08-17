@@ -93,10 +93,9 @@ export class CreateNote {
     }
   }
 
-  onEnter(event: Event, index: number) {
+  onEnter(event: Event) {
     event.preventDefault();
     this.listNote.update(lista => [...lista, '']);
-    console.log('Asi va quedando la lista:', this.listNote())
     setTimeout(() => {
       const inputs = this.elementosInput();
       if (inputs.length > 0) {
@@ -126,11 +125,17 @@ export class CreateNote {
         txt: 'Nota vacía. No se creó la Nota.',
       });
     } else {
+      let contenTemp:any;
+      if( this.isList() ) {
+        contenTemp = this.listNote();
+      } else {
+        contenTemp = this.content();
+      }
       this.loadSignal.emit(true);
       const newNote: Note = {
         id: Math.random().toString(36).substring(2, 8).toUpperCase(),
         title: this.title(),
-        content: this.content(),
+        content: contenTemp,
         fix: this.fix(),
         color: this.color(),
         img: this.imagenUrl(),
@@ -144,6 +149,8 @@ export class CreateNote {
         this.fix.set(false);
         this.imagenUrl.set(null);
         this.color.set('bg-white');
+        this.isList.set(false);
+        this.listNote.set([]);
         this.showListButton.set(true);
       }, () => {
         this.alertEmit.emit({
@@ -156,6 +163,9 @@ export class CreateNote {
         this.fix.set(false);
         this.imagenUrl.set(null);
         this.color.set('bg-white');
+        this.isList.set(false);
+        this.listNote.set([]);
+        this.showListButton.set(true);
       });
     }
   }

@@ -27,7 +27,6 @@ export class App implements OnInit, OnDestroy {
 
   private evaluarTema(esOscuro: boolean): void {
     this.temaActual.set(esOscuro ? 'dark' : 'light');
-    console.log('>>>>>',this.temaActual())
   }
 
   // Se declara como un método de clase normal y limpio

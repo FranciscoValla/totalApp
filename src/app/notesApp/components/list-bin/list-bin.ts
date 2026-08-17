@@ -37,6 +37,15 @@ export class LisBin {
     }
   });
 
+  isArray = computed( ()=> {
+    if( Array.isArray( this.bin().content) ) {
+      return true;
+    } else  {
+      return false;
+    }
+  });
+
+
   onEmit() {
     this.binOutput.emit(this.bin());
   }

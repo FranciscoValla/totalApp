@@ -42,6 +42,14 @@ export class ListNote {
     }
   });
 
+  isArray = computed( ()=> {
+    if( Array.isArray( this.note().content) ) {
+      return true;
+    } else  {
+      return false;
+    }
+  });
+
   deleteNote(id: string) {
     this.loadSignal.emit(true);
     this.noteServices.deleteNoteFireStore(id).pipe(
@@ -73,7 +81,7 @@ export class ListNote {
         this.emitingAlert(type, txt);
         this.loadSignal.emit(false);
       },
-      error: () => {
+      error: (err) => {
         this.emitingAlert('bg-bg-danger', 'Error al Obtener las Notas.');
         this.loadSignal.emit(false);
       },

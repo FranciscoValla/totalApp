@@ -1,4 +1,4 @@
-<div class="new-note border border-secondary-subtle rounded p-2 {{color()}} w-100 m-4">
+<div class="new-note border border-secondary-subtle rounded px-2 {{color()}} w-100 m-4">
   @if (isExpanded()) {
   <div class="row">
     @if(isExpanded() && imagenUrl()) {
@@ -6,7 +6,7 @@
         <img [src]="imagenUrl()" class="w-100 rounded img-base">
       </div>
     }
-    <div class="col-11">
+    <div class="col-11 py-1">
       <textarea type="text" placeholder="Titulo..." style="font-size: 24px !important;" [(ngModel)]="title"
         class="w-100 {{textcolor()}}" rows="1"
         data-bs-toggle="tooltip" data-bs-placement="top"  title="Escribe para Añadir el Título"> </textarea>
@@ -14,13 +14,13 @@
   </div>
   }
   @if (!isList()) {
-    <div class="row px-1">
-    <div class="col-11 p-0 m-0 px-1">
+    <div class="row px-1 py-0">
+    <div class="col-11 p-0 m-0 px-1 py-1">
       <textarea type="text" placeholder="Añade una nota..." class="w-100 {{textcolor()}}" [rows]="isExpanded() ? 3 : 1"
         (focus)="isExpanded.set(true); showListButton.set(false);" [(ngModel)]="content"
         data-bs-toggle="tooltip" data-bs-placement="top" title="Escribe para Crear Nota"></textarea>
     </div>
-    <div class="col-1 p-0 m-0 d-flex justify-content-center align-items-center rounded lisInp"
+    <div class="col-1 p-0 m-0 d-flex justify-content-center align-items-center rounded lisInp rounded border"
     data-bs-toggle="tooltip" data-bs-placement="top" title="Crear Lista" [class.d-none]="!showListButton()"
     (click)="isList.set(true); showListButton.set(true); listNote.set(['']); isExpanded.set(true)">
       <i class="fa-solid fa-list {{textcolor()}}"></i>
@@ -38,7 +38,7 @@
             class="form-control bg-transparent {{textcolor()}}"
             placeholder="Escribe aqui la ..."
             [(ngModel)]="listNote()[$index]"
-            (keydown.enter)="onEnter($event, $index)">
+            (keydown.enter)="onEnter($event)">
           </div>
           <div class="col-1 p-0 m-0 px-1 lisInp d-flex justify-content-center align-items-center rounded"
           (click)="deleteliList($index)">
