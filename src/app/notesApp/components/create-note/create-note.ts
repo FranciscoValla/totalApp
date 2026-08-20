@@ -31,7 +31,7 @@ export class CreateNote {
 
   isExpanded = signal(false);
   isList = signal(false);
-  listNote = signal<string[]>([]);
+  listNote = signal<{ type: boolean; txt: string }[]>([]);
   showListButton = signal(true);
   elementosInput = viewChildren<ElementRef<HTMLInputElement>>('notaInput');
   isShowSelectColor = signal(false);
@@ -95,7 +95,7 @@ export class CreateNote {
 
   onEnter(event: Event) {
     event.preventDefault();
-    this.listNote.update(lista => [...lista, '']);
+    this.listNote.update(lista => [...lista, {type:true, txt: ''}]);
     setTimeout(() => {
       const inputs = this.elementosInput();
       if (inputs.length > 0) {
@@ -110,27 +110,30 @@ export class CreateNote {
     );
   }
   createNote() {
+    let contenTemp:any;
+      if( this.isList() ) {
+        contenTemp = this.listNote();
+      } else {
+        contenTemp = this.content();
+      }
     if (
       this.title().trim().length === 0 &&
-      this.content().trim().length === 0 &&
+      contenTemp.length === 0 &&
       this.imagenUrl() === null
     ) {
       this.isExpanded.set(false);
       this.fix.set(false);
       this.color.set('bg-white');
       this.imagenUrl.set(null);
+      this.isList.set(false);
+      this.listNote.set([]);
       this.showListButton.set(true);
       this.alertEmit.emit({
         type: 'bg-warning',
         txt: 'Nota vacía. No se creó la Nota.',
       });
     } else {
-      let contenTemp:any;
-      if( this.isList() ) {
-        contenTemp = this.listNote();
-      } else {
-        contenTemp = this.content();
-      }
+
       this.loadSignal.emit(true);
       const newNote: Note = {
         id: Math.random().toString(36).substring(2, 8).toUpperCase(),

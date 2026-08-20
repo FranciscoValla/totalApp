@@ -20,33 +20,26 @@
         (focus)="isExpanded.set(true); showListButton.set(false);" [(ngModel)]="content"
         data-bs-toggle="tooltip" data-bs-placement="top" title="Escribe para Crear Nota"></textarea>
     </div>
-    <div class="col-1 p-0 m-0 d-flex justify-content-center align-items-center rounded lisInp rounded border"
+    <div class="col-1 p-0 m-0 d-flex justify-content-center align-items-center lisInp"
     data-bs-toggle="tooltip" data-bs-placement="top" title="Crear Lista" [class.d-none]="!showListButton()"
-    (click)="isList.set(true); showListButton.set(true); listNote.set(['']); isExpanded.set(true)">
-      <i class="fa-solid fa-list {{textcolor()}}"></i>
+    (click)="isList.set(true); showListButton.set(true); listNote.set([{ type: true, txt: '' }]); isExpanded.set(true)">
+      <i class="fa-regular fa-square-check {{textcolor()}}" style="font-size: 22px;"></i>
     </div>
   </div>
   } @else {
-    <ul class="list-group border border-0 rounded-0 bg-transparent">
-    @for (item of listNote(); track $index) {
-      <li class="list-group-item p-0 border-0 rounded-0 border-top bg-transparent">
-        <div class="row px-1 lis-note">
-          <div class="col-11 p-0 m-0 px-1">
-            <input
-            #notaInput
-            type="text"
-            class="form-control bg-transparent {{textcolor()}}"
-            placeholder="Escribe aqui la ..."
-            [(ngModel)]="listNote()[$index]"
-            (keydown.enter)="onEnter($event)">
-          </div>
-          <div class="col-1 p-0 m-0 px-1 lisInp d-flex justify-content-center align-items-center rounded"
-          (click)="deleteliList($index)">
-            <i class="fa-solid fa-xmark"></i>
-          </div>
-        </div>
-      </li>
-    }
+    <ul class="list-group bg-transparen">
+      @for (item of listNote(); track $index) {
+        <li class="list-group-item bg-transparent d-flex align-items-center gap-1 rounded-0 px-2 py-1 {{textcolor()}}">
+          <input class="inline-block"
+          #notaInput
+          type="text"
+          class="form-control bg-transparent {{textcolor()}}"
+          placeholder="Escribe aqui la ..."
+          [(ngModel)]="listNote()[$index].txt"
+          (keydown.enter)="onEnter($event)">
+          <i class="fa-solid fa-xmark inline-block" (click)="deleteliList($index)"></i>
+        </li>
+      }
     </ul>
   }
 

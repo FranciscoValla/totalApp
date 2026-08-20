@@ -4,13 +4,16 @@ export function mapFireSToNote (doc:any):Note {
   if(!doc) return {} as Note;
   const fields = doc.fields || {};
   const idUnico = doc.name ? doc.name.split('/').pop() : '';
-  let contenFinal:string | string[] = '';
+  let contenFinal:string | { type: boolean; txt: string }[] = '';
   if ( fields.content ) {
     if (fields.content .stringValue !== undefined) {
       contenFinal = fields.content.stringValue;
     } else if (fields.content.arrayValue && fields.content.arrayValue.values) {
        contenFinal = fields.content.arrayValue.values.map(
-        (val:any) => val.stringValue || ''
+        (val:any) => ({
+          type: val.mapValue?.fields?.type?.booleanValue ?? false,
+          txt: val.mapValue?.fields?.txt?.stringValue || ''
+        })
       );
     }
   }

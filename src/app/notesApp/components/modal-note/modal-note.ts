@@ -33,6 +33,8 @@ export class ModalNote implements OnInit, OnDestroy {
   iCompService = inject(CompressImage);
   isShowSelectColor = signal(false);
   alertEmit = output<AlertInterface>();
+  loadSignal = output<boolean>();
+
   textColor = computed(() => {
     switch (this.noteCurrent().color) {
       case 'bg-primary':
@@ -51,18 +53,49 @@ export class ModalNote implements OnInit, OnDestroy {
     }
   });
 
+  isArray = computed( ()=> {
+    if( Array.isArray( this.noteCurrent().content) ) {
+      return true;
+    } else  {
+      return false;
+    }
+  });
+
+  contentAsArray = computed<{ type: boolean; txt: string }[]>(() => {
+    const content = this.noteCurrent().content;
+    return Array.isArray(content) ? (content as { type: boolean; txt: string }[]) : [];
+  });
+
   private document = inject(DOCUMENT);
-
-  // ... el resto de tus propiedades actuales (inputs, signals, computed)
-
-  // 🚀 Cuando el modal aparece en pantalla, congelamos el fondo
   ngOnInit(): void {
     this.document.body.classList.add('modal-abierto');
   }
 
-  // 🚀 Cuando el modal se cierra (se destruye el componente), descongelamos el fondo
   ngOnDestroy(): void {
     this.document.body.classList.remove('modal-abierto');
+  }
+
+  changeState( indexTarget:number) {
+    const contenidoActual = Array.isArray(this.noteCurrent().content)
+      ? (this.noteCurrent().content as { type: boolean; txt: string }[])
+      : [];
+    const nuevoContenido = contenidoActual.map((item, index) => {
+      if (index === indexTarget) {
+        return { ...item, type: !item.type };
+      }
+      return item;
+    });
+    this.noteCurrent.update( (current)=> ({
+      ...current, content: nuevoContenido
+    }));
+    // this.noteServices.updateNoteFireStore(this.noteCurrent().id, { content: nuevoContenido }).subscribe({
+    //   next: () => {
+    //     this.refreshNotes('bg-success', 'Estado de la tarea actualizado.');
+    //   },
+    //   error: () => {
+    //     this.emitingAlert('bg-danger', 'Error al cambiar estado de la tarea.');
+    //   }
+    // });
   }
 
   updateNoteFix() {
@@ -92,24 +125,23 @@ export class ModalNote implements OnInit, OnDestroy {
         img: imageCompressBase64,
       }));
       } catch {
-
       }
       inputElement.value = '';
     }
   }
 
   deleteNote(id: string) {
-      this.noteServices.deleteNoteFireStore(id).pipe(
-        timeout(6000),
-        finalize(() => {}),
-      ).subscribe({
-        next: () => this.addBin(),
-        error: (err) => {
-          this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.');
-          this.onClose();
-        },
-      });
-    }
+    this.noteServices.deleteNoteFireStore(id).pipe(
+      timeout(6000),
+      finalize(() => {}),
+    ).subscribe({
+      next: () => this.addBin(),
+      error: (err) => {
+        this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.');
+        this.onClose();
+      },
+    });
+  }
 
     addBin() {
       this.noteServices.addListBinFireStore(this.noteInput()).pipe(
@@ -125,49 +157,47 @@ export class ModalNote implements OnInit, OnDestroy {
     }
 
   onClose() {
+    this.loadSignal.emit(true);
     const originalNote = this.noteInput();
     const actualNote = this.noteCurrent();
     const update:Partial<Note> = {};
     const isUpload = signal(false);
-
     if ( originalNote.title !== actualNote.title){
       update.title = actualNote.title;
       isUpload.set(true);
     }
-
     if ( originalNote.content !== actualNote.content){
       update.content = actualNote.content;
       isUpload.set(true);
     }
-
     if ( originalNote.color !== actualNote.color){
       update.color = actualNote.color;
       isUpload.set(true);
     }
-
     if ( originalNote.fix !== actualNote.fix){
       update.fix = actualNote.fix;
       isUpload.set(true);
     }
-
     if ( originalNote.img !== actualNote.img){
       update.img = actualNote.img;
       isUpload.set(true);
     }
-
     if( isUpload() ) {
       this.noteServices.updateNoteFireStore(this.noteInput().id, update).subscribe({
         next: ()=> {
           this.refreshNotes('bg-success', 'Nota Actualizada Correctamente.');
           this.emitClose.emit();
+          setTimeout(() => {
+            this.loadSignal.emit(false);
+          }, 200);
         },
         error:()=>  {
           this.emitingAlert('bg-danger', 'Error al Actualizar Nota.');
           this.emitClose.emit();
+          this.loadSignal.emit(false);
         }
       });
     } else {
-      // 3. Si el usuario no modificó nada, el modal se cierra al instante
       this.emitClose.emit();
     }
     isUpload.set(false);

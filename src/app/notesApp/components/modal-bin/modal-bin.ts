@@ -39,6 +39,16 @@ export class ModalBin {
     }
   });
 
+  isArray = computed(() => {
+    const content = this.binInput().content;
+    return Array.isArray(content); // ✨ Esto devolverá estrictamente true o false
+  });
+
+  contentAsArray = computed<{ type: boolean; txt: string }[]>(() => {
+    const content = this.binInput().content;
+    return Array.isArray(content) ? (content as { type: boolean; txt: string }[]) : [];
+  });
+
   onClose() {
     this.emitClose.emit();
   }

@@ -10,12 +10,31 @@
         <img [src]="binInput().img" class="w-100 rounded img-base">
       </div>
       }
-      <textarea type="text" placeholder="Titulo..." style="font-size: 24px;" [(ngModel)]="binInput().title"
-        class="w-100 {{textColor()}}" rows="1"> </textarea>
+      <p class="card-text {{textColor()}}" style="font-size: 24px;">{{binInput().title}}</p>
     </div>
     <div class="card-body pt-0 p-2" style="cursor: p;">
-      <textarea type="text" placeholder="Añade una nota..." style="font-size: 16px;" class="w-100 {{textColor()}}"
-        [rows]="5" [(ngModel)]="binInput().content"></textarea>
+        @if ( !isArray()) {
+          <p class="card-text {{textColor()}}">{{binInput().content}}</p>
+        } @else {
+          <ul class="card-text {{textColor()}} p-0 m-0 list-unstyled">
+            @for (item of (contentAsArray()); track $index) {
+              @if( item.type ) {
+                <li class="p-0 m-0">
+                  <i class="fa-regular fa-square" style="font-size: 18px !important;"></i> {{ item.txt }}
+                </li>
+              }
+            }
+          </ul>
+          <ul class="card-text {{textColor()}} p-0 pt-1 m-0 mt-1 list-unstyled opacity-50 border-top">
+            @for (item of (contentAsArray()); track $index) {
+              @if( !item.type ) {
+                <li class="p-0 m-0 text-decoration-line-through">
+                  <i class="fa-regular fa-square-check" style="font-size: 18px !important;"></i> {{ item.txt }}
+                </li>
+              }
+            }
+          </ul>
+        }
     </div>
     <div class="position-relative card-footer text-end">
       <div class="row px-2">

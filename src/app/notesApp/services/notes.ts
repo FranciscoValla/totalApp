@@ -43,10 +43,30 @@ export class NoteServices {
       fields.title = { stringValue: updateNote.title || '' };
       queryParams.push('updateMask.fieldPaths=title');
     }
+
     if (updateNote.content !== undefined) {
-      fields.content = { stringValue: updateNote.content || '' };
+      // 1. Verificamos si lo que vamos a actualizar es un arreglo de objetos
+      if (Array.isArray(updateNote.content)) {
+        fields.content = {
+          arrayValue: {
+            values: updateNote.content.map((item: any) => ({
+              mapValue: {
+                fields: {
+                  type: { booleanValue: item.type ?? false }, // Guarda el booleano
+                  txt: { stringValue: item.txt || '' }       // Guarda el texto
+                }
+              }
+            }))
+          }
+        };
+      } else {
+        // 2. Si es una nota de texto normal de toda la vida, se queda igual
+        fields.content = { stringValue: updateNote.content || '' };
+      }
       queryParams.push('updateMask.fieldPaths=content');
     }
+
+
     if (updateNote.color !== undefined) {
       fields.color = { stringValue: updateNote.color || 'bg-white' };
       queryParams.push('updateMask.fieldPaths=color');
@@ -99,7 +119,15 @@ export class NoteServices {
     if (Array.isArray(newNote.content)) {
       contentFire = {
         arrayValue: {
-          values: newNote.content.map( txt => ({stringValue: txt || ''}))
+          // values: newNote.content.map( txt => ({stringValue: txt || ''}))
+          values: newNote.content.map( (item:any)=> ({
+            mapValue: {
+              fields: {
+                type: { booleanValue: item.type ?? false },
+                txt: { stringValue: item.txt || '' }
+              }
+            }
+          }))
         }
       };
     } else {

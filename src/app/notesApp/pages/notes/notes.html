@@ -50,7 +50,10 @@
 </div>
 
 <!-- Simplificado: Eliminamos el @if estructural -->
-@if ( showModal() && noteModal();) {
-<modal-note [noteInput]="noteModal()!" (emitClose)="showModal.set(false);
+<!-- @if ( showModal() && noteModal();) { -->
+<modal-note  [class.d-none]="!showModal()"
+[noteInput]="noteModal()!"
+(loadSignal)="load.set($event)"
+(emitClose)="showModal.set(false);
 noteModal.set(null);" class="position-absolute top-50 start-50"></modal-note>
-}
+<!-- } -->

@@ -37,14 +37,15 @@ export class LisBin {
     }
   });
 
-  isArray = computed( ()=> {
-    if( Array.isArray( this.bin().content) ) {
-      return true;
-    } else  {
-      return false;
-    }
+  isArray = computed(() => {
+    const content = this.bin().content;
+    return Array.isArray(content); // ✨ Esto devolverá estrictamente true o false
   });
 
+  contentAsArray = computed<{ type: boolean; txt: string }[]>(() => {
+    const content = this.bin().content;
+    return Array.isArray(content) ? (content as { type: boolean; txt: string }[]) : [];
+  });
 
   onEmit() {
     this.binOutput.emit(this.bin());

@@ -42,12 +42,14 @@ export class ListNote {
     }
   });
 
-  isArray = computed( ()=> {
-    if( Array.isArray( this.note().content) ) {
-      return true;
-    } else  {
-      return false;
-    }
+  isArray = computed(() => {
+    const content = this.note().content;
+    return Array.isArray(content); // ✨ Esto devolverá estrictamente true o false
+  });
+
+  contentAsArray = computed<{ type: boolean; txt: string }[]>(() => {
+    const content = this.note().content;
+    return Array.isArray(content) ? (content as { type: boolean; txt: string }[]) : [];
   });
 
   deleteNote(id: string) {
@@ -85,6 +87,26 @@ export class ListNote {
         this.emitingAlert('bg-bg-danger', 'Error al Obtener las Notas.');
         this.loadSignal.emit(false);
       },
+    });
+  }
+
+  changeState( indexTarget:number) {
+    const contenidoActual = Array.isArray(this.note().content)
+      ? (this.note().content as { type: boolean; txt: string }[])
+      : [];
+    const nuevoContenido = contenidoActual.map((item, index) => {
+      if (index === indexTarget) {
+        return { ...item, type: !item.type };
+      }
+      return item;
+    });
+    this.noteServices.updateNoteFireStore(this.note().id, { content: nuevoContenido }).subscribe({
+      next: () => {
+        this.refreshNotes('bg-success', 'Estado de la tarea actualizado.');
+      },
+      error: () => {
+        this.emitingAlert('bg-danger', 'Error al cambiar estado de la tarea.');
+      }
     });
   }
 

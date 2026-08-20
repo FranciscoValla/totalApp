@@ -3,7 +3,6 @@
     <div class="col-11 col-md-10">
       <div class="card border border-0 rounded p-0 shadow" [ngClass]="noteCurrent().color"
       (click)="$event.stopPropagation()">
-
         <div class="card-header align-items-center p-2 {{textColor()}}"
           style="cursor: pointer; font-size: 24px !important; font-weight: 600;">
           @if(noteCurrent().img) {
@@ -15,16 +14,36 @@
             class="col-12 {{textColor()}}" rows="1"
             data-bs-toggle="tooltip" data-bs-placement="top"  title="Escribe para cambiar el título"> </textarea>
         </div>
-
         <div class="card-body pt-0 p-2" style="cursor: pointer;">
-          <textarea type="text" placeholder="Añade una nota..." style="font-size: 16px;" class="w-100 {{textColor()}}"
+          @if ( !isArray()) {
+            <textarea type="text" placeholder="Añade una nota..." style="font-size: 16px;" class="w-100 {{textColor()}}"
             [rows]="5" [(ngModel)]="noteCurrent().content"
             data-bs-toggle="tooltip" data-bs-placement="top"  title="Escribe para cambiar la Nota"></textarea>
+          } @else {
+            <ul class="card-text {{textColor()}} p-0 m-0 list-unstyled">
+              @for (item of (contentAsArray()); track $index) {
+                @if( item.type ) {
+                  <li class="p-0 m-0">
+                    <i class="fa-regular fa-square" style="font-size: 18px !important;"
+                    (click)="$event.stopPropagation(); changeState($index)"></i> {{ item.txt }}
+                  </li>
+                }
+              }
+            </ul>
+            <ul class="card-text {{textColor()}} p-0 pt-1 m-0 mt-1 list-unstyled opacity-50 border-top">
+              @for (item of (contentAsArray()); track $index) {
+                @if( !item.type ) {
+                  <li class="p-0 m-0 text-decoration-line-through">
+                    <i class="fa-regular fa-square-check" style="font-size: 18px !important;"
+                    (click)="$event.stopPropagation(); changeState($index)"></i> {{ item.txt }}
+                  </li>
+                }
+              }
+            </ul>
+          }
         </div>
-
         <div class="position-relative card-footer text-end">
           <div class="row px-2">
-            <!-- 1. Botón Paleta (El click se queda en el icono) -->
             <div class="col-2 col-md-1 d-flex justify-content-center align-items-center position-relative rounded"
             (click)="isShowSelectColor.set(true)" style="cursor: pointer;"
                 data-bs-toggle="tooltip" data-bs-placement="top"  title="Cambiar Color Fondo">
@@ -34,14 +53,12 @@
                 [colorInput]="noteCurrent().color!"></select-color>
               }
             </div>
-            <!-- 2. Botón Fijar (El click se queda en el icono) -->
             <div class="col-2 col-md-1 d-flex justify-content-center align-items-center rounded"
             (click)="updateNoteFix();" style="cursor: pointer;"
             data-bs-toggle="tooltip" data-bs-placement="top"  title="Fijar/DesFijar Nota">
               <i class="fa-solid {{textColor()}} p-2"
                 [ngClass]="noteCurrent().fix ? 'fa-thumbtack' : 'fa-thumbtack-slash'"></i>
             </div>
-            <!-- 3. Botón Imagen (Tu truco original adaptado a las columnas nuevas) -->
             <div class="col-2 col-md-1 d-flex justify-content-center align-items-center position-relative rounded"
             data-bs-toggle="tooltip" data-bs-placement="top"  title="Cambiar/Agregar Imagen"
               style="overflow: hidden;">
@@ -50,7 +67,6 @@
                 accept="image/*" style="cursor: pointer;" (click)="$event.stopPropagation()"
                 (change)="$event.stopPropagation(); onFileSelected($event)" />
             </div>
-            <!-- 4. Botón Basura -->
             <div class="offset-4 col-2 offset-md-8 col-md-1 d-flex justify-content-center align-items-center rounded"
             (click)="$event.stopPropagation(); deleteNote(noteCurrent().id);" style="cursor: pointer;"
             data-bs-toggle="tooltip" data-bs-placement="top"  title="Borrar Nota">

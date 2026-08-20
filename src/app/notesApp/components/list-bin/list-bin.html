@@ -9,14 +9,25 @@
     {{bin().title}}
   </div>
   <div class="card-body pt-0 p-2" style="cursor: p;" (click)="onEmit()">
-     @if ( !isArray()) {
+    @if ( !isArray()) {
       <p class="card-text {{textColor()}}">{{bin().content}}</p>
     } @else {
       <ul class="card-text {{textColor()}} p-0 m-0 list-unstyled">
-        @for (item of bin().content; track $index) {
-          <li class="p-0 m-0">
-            {{item}}
-          </li>
+        @for (item of (contentAsArray()); track $index) {
+          @if( item.type ) {
+            <li class="p-0 m-0">
+              <i class="fa-regular fa-square" style="font-size: 18px !important;"></i> {{ item.txt }}
+            </li>
+          }
+        }
+      </ul>
+      <ul class="card-text {{textColor()}} p-0 pt-1 m-0 mt-1 list-unstyled opacity-50 border-top">
+        @for (item of (contentAsArray()); track $index) {
+          @if( !item.type ) {
+            <li class="p-0 m-0 text-decoration-line-through">
+              <i class="fa-regular fa-square-check" style="font-size: 18px !important;"></i> {{ item.txt }}
+            </li>
+          }
         }
       </ul>
     }
