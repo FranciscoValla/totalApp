@@ -2,14 +2,11 @@ a {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 14px !important;
   font-weight: 600 !important;
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
+}
+i{
+  margin-right: 8px;
 }
 
 a:hover {
   background-color: var(--bs-secondary-bg-subtle);
-}
-
-i {
-  margin-right: 16px;
 }

@@ -16,6 +16,7 @@ import { NgClass } from '@angular/common';
 import { SelectColor } from '../select-color/select-color';
 import { AlertInterface } from '../../pages/bin/bin';
 import { CompressImage } from '../../services/compress-image';
+import { AlertServices } from '../../services/alert-services';
 declare var bootstrap: any;
 
 @Component({
@@ -27,6 +28,7 @@ declare var bootstrap: any;
 export class CreateNote {
   noteServices = inject(NoteServices);
   iComprService = inject(CompressImage);
+  alertService = inject(AlertServices);
   private elementRef = inject(ElementRef);
 
   isExpanded = signal(false);
@@ -37,7 +39,6 @@ export class CreateNote {
   isShowSelectColor = signal(false);
 
   loadSignal = output<boolean>();
-  alertEmit = output<AlertInterface>();
   imagenUrl = signal<string | null>(null);
 
   title = signal('');
@@ -63,8 +64,10 @@ export class CreateNote {
   });
 
   constructor() {
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(
+      (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+    );
     effect(() => {
       const inputs = this.elementosInput();
       if (inputs.length > 0) {
@@ -87,15 +90,15 @@ export class CreateNote {
         this.listNote.set([]);
         this.showListButton.set(true);
       } else {
-        this.createNote();
-      }
-      this.color.set('bg-white');
+      this.createNote();
+    }
+    this.color.set('bg-white');
     }
   }
 
   onEnter(event: Event) {
     event.preventDefault();
-    this.listNote.update(lista => [...lista, {type:true, txt: ''}]);
+    this.listNote.update((lista) => [...lista, { type: true, txt: '' }]);
     setTimeout(() => {
       const inputs = this.elementosInput();
       if (inputs.length > 0) {
@@ -104,23 +107,22 @@ export class CreateNote {
     }, 10);
   }
 
-  deleteliList (indexDelete:number) {
-    this.listNote.update( li =>
-      li.filter( (_item,index) => index !== indexDelete )
-    );
+  deleteliList(indexDelete: number) {
+    this.listNote.update((li) => li.filter((_item, index) => index !== indexDelete));
   }
   createNote() {
-    let contenTemp:any;
-      if( this.isList() ) {
-        contenTemp = this.listNote();
-      } else {
-        contenTemp = this.content();
-      }
-    if (
-      this.title().trim().length === 0 &&
-      contenTemp.length === 0 &&
-      this.imagenUrl() === null
-    ) {
+    let contenTemp: any;
+    let contenIsTemp: boolean;
+    if (this.isList()) {
+      contenTemp = this.listNote();
+      let isClean = this.listNote().filter( item => item.txt !== '');
+      if(this.listNote().length === 0) contenIsTemp = false;
+      contenIsTemp = false ? this.listNote().length === 0 : true;
+    } else {
+      contenTemp = this.content();
+      contenIsTemp = false ? contenTemp.length === 0 : true;
+    }
+    if (this.title().trim().length === 0 && contenIsTemp === false && this.imagenUrl() === null) {
       this.isExpanded.set(false);
       this.fix.set(false);
       this.color.set('bg-white');
@@ -128,12 +130,11 @@ export class CreateNote {
       this.isList.set(false);
       this.listNote.set([]);
       this.showListButton.set(true);
-      this.alertEmit.emit({
-        type: 'bg-warning',
+      this.alertService.showAlert({
+        type: 'bg-warning-subtle',
         txt: 'Nota vacía. No se creó la Nota.',
       });
     } else {
-
       this.loadSignal.emit(true);
       const newNote: Note = {
         id: Math.random().toString(36).substring(2, 8).toUpperCase(),
@@ -144,49 +145,49 @@ export class CreateNote {
         img: this.imagenUrl(),
         date: new Date(),
       };
-      this.noteServices.createNoteFireStore(newNote).subscribe( ()=> {
-        this.refreshNotes();
-        this.isExpanded.set(false);
-        this.title.set('');
-        this.content.set('');
-        this.fix.set(false);
-        this.imagenUrl.set(null);
-        this.color.set('bg-white');
-        this.isList.set(false);
-        this.listNote.set([]);
-        this.showListButton.set(true);
-      }, () => {
-        this.alertEmit.emit({
-          type: 'bg-bg-danger',
-          txt: 'Error al guardar la Nota. No se creó la Nota.',
-        });
-        this.isExpanded.set(false);
-        this.title.set('');
-        this.content.set('');
-        this.fix.set(false);
-        this.imagenUrl.set(null);
-        this.color.set('bg-white');
-        this.isList.set(false);
-        this.listNote.set([]);
-        this.showListButton.set(true);
-      });
+      this.noteServices.createNoteFireStore(newNote).subscribe(
+        () => {
+          this.refreshNotes();
+          this.isExpanded.set(false);
+          this.title.set('');
+          this.content.set('');
+          this.fix.set(false);
+          this.imagenUrl.set(null);
+          this.color.set('bg-white');
+          this.isList.set(false);
+          this.listNote.set([]);
+          this.showListButton.set(true);
+        },
+        () => {
+          this.alertService.showAlert({
+            type: 'bg-danger-subtle',
+            txt: 'Error al guardar la Nota. No se creó la Nota.',
+          });
+          this.isExpanded.set(false);
+          this.title.set('');
+          this.content.set('');
+          this.fix.set(false);
+          this.imagenUrl.set(null);
+          this.color.set('bg-white');
+          this.isList.set(false);
+          this.listNote.set([]);
+          this.showListButton.set(true);
+        },
+      );
     }
   }
 
   refreshNotes() {
-    this.noteServices.getNotesFireStore().subscribe( ()=> {
-      this.alertEmit.emit({
-        type: 'bg-success',
-        txt: 'Nota Creada.',
-      });
-      this.loadSignal.emit(false);
-    }, () => {
-      this.alertEmit.emit({
-          type: 'bg-bg-danger',
-          txt: 'Error al cargar notas.',
-        });
-      this.loadSignal.emit(false);
-    })
+    this.noteServices.getNotesFireStore().subscribe(
+      () => {
+        this.alertService.showAlert({ type: 'bg-success-subtle', txt: 'Nota Creada.' });
+        this.loadSignal.emit(false);
+      },
+      () => {
+        this.alertService.showAlert({ type: 'bg-danger-subtle', txt: 'Error al cargar notas.' });
+        this.loadSignal.emit(false);
+      },
+    );
   }
 
   async onFileSelected(event: Event): Promise<void> {
@@ -197,9 +198,9 @@ export class CreateNote {
         const imageCompressBase64 = await this.iComprService.compressFile(file, 1200, 0.4);
         this.imagenUrl.set(imageCompressBase64);
       } catch {
-        this.alertEmit.emit({
-          type: 'bg-bg-danger',
-          txt: 'Error al guardar la imagen',
+        this.alertService.showAlert({
+          type: 'bg-danger-subtle',
+          txt: 'Error al guardar la imagen.',
         });
       }
     }

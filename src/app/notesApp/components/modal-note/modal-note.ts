@@ -2,11 +2,10 @@ import {
   Component,
   computed,
   DOCUMENT,
+  effect,
   inject,
   input,
   linkedSignal,
-  OnDestroy,
-  OnInit,
   output,
   signal,
 } from '@angular/core';
@@ -18,6 +17,7 @@ import { SelectColor } from '../select-color/select-color';
 import { CompressImage } from '../../services/compress-image';
 import { AlertInterface } from '../../pages/bin/bin';
 import { finalize, timeout } from 'rxjs';
+import { AlertServices } from '../../services/alert-services';
 
 @Component({
   selector: 'modal-note',
@@ -25,14 +25,14 @@ import { finalize, timeout } from 'rxjs';
   templateUrl: './modal-note.html',
   styleUrl: './modal-note.css',
 })
-export class ModalNote implements OnInit, OnDestroy {
+export class ModalNote {
   noteInput = input.required<Note>();
   noteCurrent = linkedSignal(() => ({ ...this.noteInput() }));
+  alerService = inject(AlertServices);
   emitClose = output();
   noteServices = inject(NoteServices);
   iCompService = inject(CompressImage);
   isShowSelectColor = signal(false);
-  alertEmit = output<AlertInterface>();
   loadSignal = output<boolean>();
 
   textColor = computed(() => {
@@ -67,12 +67,15 @@ export class ModalNote implements OnInit, OnDestroy {
   });
 
   private document = inject(DOCUMENT);
-  ngOnInit(): void {
-    this.document.body.classList.add('modal-abierto');
-  }
-
-  ngOnDestroy(): void {
-    this.document.body.classList.remove('modal-abierto');
+  isModalOpen = input<boolean>(false);
+  constructor() {
+    effect(() => {
+      if (this.isModalOpen()) {
+        this.document.body.classList.add('modal-abierto');
+      } else {
+        this.document.body.classList.remove('modal-abierto');
+      }
+    });
   }
 
   changeState( indexTarget:number) {
@@ -88,14 +91,6 @@ export class ModalNote implements OnInit, OnDestroy {
     this.noteCurrent.update( (current)=> ({
       ...current, content: nuevoContenido
     }));
-    // this.noteServices.updateNoteFireStore(this.noteCurrent().id, { content: nuevoContenido }).subscribe({
-    //   next: () => {
-    //     this.refreshNotes('bg-success', 'Estado de la tarea actualizado.');
-    //   },
-    //   error: () => {
-    //     this.emitingAlert('bg-danger', 'Error al cambiar estado de la tarea.');
-    //   }
-    // });
   }
 
   updateNoteFix() {
@@ -137,7 +132,7 @@ export class ModalNote implements OnInit, OnDestroy {
     ).subscribe({
       next: () => this.addBin(),
       error: (err) => {
-        this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.');
+        this.emitingAlert('bg-danger-subtle', 'Error al borrar Nota y mandar a Papelera.');
         this.onClose();
       },
     });
@@ -148,9 +143,9 @@ export class ModalNote implements OnInit, OnDestroy {
         timeout(6000),
         finalize(() => {}),
       ).subscribe({
-        next: () => this.refreshNotes('bg-warning', 'Nota Borrada. Se Manda a Papelera.'),
+        next: () => this.refreshNotes('bg-warning-subtle', 'Nota Borrada. Se Manda a Papelera.'),
         error: () => {
-          this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.');
+          this.emitingAlert('bg-danger-subtle', 'Error al borrar Nota y mandar a Papelera.');
           this.onClose();
         }
       });
@@ -185,20 +180,21 @@ export class ModalNote implements OnInit, OnDestroy {
     if( isUpload() ) {
       this.noteServices.updateNoteFireStore(this.noteInput().id, update).subscribe({
         next: ()=> {
-          this.refreshNotes('bg-success', 'Nota Actualizada Correctamente.');
+          this.refreshNotes('bg-success-subtle', 'Nota Actualizada Correctamente.');
           this.emitClose.emit();
           setTimeout(() => {
             this.loadSignal.emit(false);
           }, 200);
         },
         error:()=>  {
-          this.emitingAlert('bg-danger', 'Error al Actualizar Nota.');
+          this.emitingAlert('bg-danger-subtle', 'Error al Actualizar Nota.');
           this.emitClose.emit();
           this.loadSignal.emit(false);
         }
       });
     } else {
       this.emitClose.emit();
+      this.loadSignal.emit(false);
     }
     isUpload.set(false);
   }
@@ -211,16 +207,13 @@ export class ModalNote implements OnInit, OnDestroy {
         this.emitClose.emit();
       },
       error: () => {
-        this.emitingAlert('bg-bg-danger', 'Error al Actualizar la Nota.');
+        this.emitingAlert('bg-danger-subtle', 'Error al Actualizar la Nota.');
         this.onClose();
       },
     });
   }
 
   emitingAlert(type:string, txt:string) {
-    this.alertEmit.emit({
-      type: type,
-      txt: txt,
-    });
+    this.alerService.showAlert({type: type, txt: txt});
   }
 }

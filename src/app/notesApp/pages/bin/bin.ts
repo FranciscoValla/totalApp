@@ -3,6 +3,7 @@ import { AfterViewInit, Component, computed, inject, OnInit, signal } from '@ang
 import { Note } from '../../interfaces/note.interface';
 import { LisBin } from "../../components/list-bin/list-bin";
 import { ModalBin } from '../../components/modal-bin/modal-bin';
+import { AlertServices } from '../../services/alert-services';
 
 export interface AlertInterface {
   type: string;
@@ -17,27 +18,21 @@ export interface AlertInterface {
 })
 export class Bin implements OnInit {
   notervice = inject(NoteServices);
+  alertService = inject(AlertServices);
   binModal = signal<Note | null>(null);
   showModal = signal(false);
   load = signal(false);
-  alertShow = signal<boolean>(false);
-  alert = signal<AlertInterface>({
-    type: '',
-    txt: ''
-  });
 
   ngOnInit(): void {
     this.load.set(true);
-    this.notervice.getBinsFireStore().subscribe( {
+    this.notervice.getBinsFireStore().subscribe({
       next: () => this.load.set(false),
-      error: () => {
-        this.showAlert({
-          type: 'bg-danger',
-          txt: 'Erorr al Obtener las Notas.',
-        });
-      }
-  });
+      error: (err) => {
+        this.alertService.showAlert({type:'bg-danger-subtle', txt:'Erorr al Obtener las Notas.'});
+      },
+    });
   }
+
   binList = computed(() => {
     return this.notervice.binList().sort( (a,b) => new Date(a.date).getTime() - new Date(b.date).getTime() );
   });
@@ -49,20 +44,5 @@ export class Bin implements OnInit {
 
   cleanBin () {
     this.notervice.deleteAllBin();
-  }
-
-  showAlert ( alert:AlertInterface) {
-    this.alert.set({
-      type: alert.type,
-      txt: alert.txt,
-    });
-    this.alertShow.set(true);
-    setTimeout(() => {
-      this.alertShow.set(false);
-      this.alert.set({
-        type: '',
-        txt: ''
-      });
-    }, 5000);
   }
 }

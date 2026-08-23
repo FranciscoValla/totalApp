@@ -1,10 +1,11 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, DOCUMENT, effect, inject, input, output, signal } from '@angular/core';
 import { Note } from '../../interfaces/note.interface';
 import { NoteServices } from '../../services/notes';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 import { finalize, timeout } from 'rxjs';
 import { AlertInterface } from '../../pages/bin/bin';
+import { AlertServices } from '../../services/alert-services';
 
 @Component({
   selector: 'modal-bin',
@@ -16,8 +17,8 @@ export class ModalBin {
   binInput = input.required<Note>();
   emitClose = output();
   noteServices = inject(NoteServices);
+  alerService = inject(AlertServices);
   loadSignal = output<boolean>();
-  alertEmit = output<AlertInterface>();
 
   isRestored = signal(false);
 
@@ -49,6 +50,18 @@ export class ModalBin {
     return Array.isArray(content) ? (content as { type: boolean; txt: string }[]) : [];
   });
 
+  private document = inject(DOCUMENT);
+  isModalOpen = input<boolean>(false);
+  constructor() {
+    effect(() => {
+      if (this.isModalOpen()) {
+        this.document.body.classList.add('modal-abierto');
+      } else {
+        this.document.body.classList.remove('modal-abierto');
+      }
+    });
+  }
+
   onClose() {
     this.emitClose.emit();
   }
@@ -67,10 +80,7 @@ export class ModalBin {
           }
         },
         error: () => {
-          this.alertEmit.emit({
-            type: 'bg-danger',
-            txt: 'Erorr al Borrar de Papelera.',
-          });
+          this.alerService.showAlert({type: 'bg-danger-subtle', txt: 'Erorr al Borrar de Papelera.'});
           this.loadSignal.emit(false);
         },
       });
@@ -85,10 +95,7 @@ export class ModalBin {
           this.refreshBinList();
         },
         error: () => {
-          this.alertEmit.emit({
-            type: 'bg-danger',
-            txt: 'Erorr al restaurar Nota de Papelera.',
-          });
+          this.alerService.showAlert({type: 'bg-danger-subtle', txt: 'Erorr al restaurar Nota de Papelera.'});
           this.loadSignal.emit(false);
         },
       });
@@ -102,26 +109,17 @@ export class ModalBin {
     ).subscribe({
       next: ()=> {
         if( this.isRestored() ) {
-          this.alertEmit.emit({
-            type: 'bg-success',
-            txt: 'Nota Restaurada Correctamente.',
-          });
+          this.alerService.showAlert({type: 'bg-success-subtle', txt: 'Nota Restaurada Correctamente.'});
           this.loadSignal.emit(false);
           this.emitClose.emit();
         } else  {
-          this.alertEmit.emit({
-            type: 'bg-danger',
-            txt: 'Nota Borrada Permanentemente.',
-          });
+          this.alerService.showAlert({type: 'bg-success-subtle', txt: 'Nota Borrada Permanentemente.'});
           this.loadSignal.emit(false);
           this.emitClose.emit();
         }
       },
       error: ()=> {
-        this.alertEmit.emit({
-          type: 'bg-danger',
-          txt: 'Erorr al Borrar/Restaurar Nota',
-        });
+        this.alerService.showAlert({type: 'bg-danger-subtle', txt: 'Erorr al Borrar/Restaurar Nota.'});
         this.emitClose.emit();
       }
     })

@@ -9,7 +9,6 @@
     [bin]="item"
     (binOutput)="isOpen($event)"
     (loadSignal)="load.set($event)"
-    (alertEmit)="showAlert($event)"
     ></list-bin>
     }
   </div>
@@ -26,21 +25,12 @@
 <div class="spinner-border position-absolute top-50 start-50" [class.d-none]="!load()" style="width: 5rem; height: 5rem;" role="status">
   <span class="visually-hidden ">Loading...</span>
 </div>
-
-@if (alertShow()) {
-  <div class="p-3 mb-2 rounded position-fixed bottom-0 end-0 mr-5 {{alert().type}}"
-  [class.text-white]="alert().type !== 'bg-warning' ">{{alert().txt}}</div>
-}
-
 <!-- Simplificado: Eliminamos el @if estructural -->
 @if ( showModal() && binModal(); as binSelected) {
-<!-- <modal-bin [noteInput]="noteSelected" (emitClose)="showModal.set(false); noteModal.set(null);"
-  class="position-absolute top-50 start-50"></modal-bin> -->
   <modal-bin class="position-absolute top-50 start-50"
   [binInput]="binSelected"
   (emitClose)="showModal.set(false);
   binModal.set(null)"
-  (alertEmit)="showAlert($event)"
   (loadSignal)="load.set($event)">
   </modal-bin>
 }

@@ -3,7 +3,7 @@
     style="cursor: p; font-size: 20px !important; font-weight: 600;" (click)="onEmit()">
     @if(note().img) {
       <div class="col-12">
-        <img [src]="note().img" class="w-100 rounded img-base">
+        <img [src]="note().img" class="w-100 img-base">
       </div>
     }
     {{note().title}}
@@ -12,26 +12,36 @@
     @if ( !isArray() ) {
       <p class="card-text {{textColor()}}">{{note().content}}</p>
     } @else {
-      <ul class="card-text {{textColor()}} p-0 m-0 list-unstyled">
-        @for (item of (contentAsArray()); track $index) {
-          @if( item.type ) {
-            <li class="p-0 m-0">
-              <i class="fa-regular fa-square" style="font-size: 18px !important;"
-              (click)="$event.stopPropagation(); changeState($index)"></i> {{ item.txt }}
-            </li>
+      <table class="table table-borderless">
+        <tbody>
+          @for (item of (contentAsArray()); track $index) {
+            @if( item.type ) {
+              <tr>
+                <th scope="row" class="p-0 m-0 p-0 pe-2 bg-transparent {{textColor()}}">
+                  <i class="fa-regular fa-square" style="font-size: 18px !important;"
+                  (click)="$event.stopPropagation(); changeState($index)"></i>
+                </th>
+                <td class="p-0 m-0 bg-transparent {{textColor()}}">{{ item.txt }}</td>
+              </tr>
+            }
           }
-        }
-      </ul>
-      <ul class="card-text {{textColor()}} p-0 pt-1 m-0 mt-1 list-unstyled opacity-50 border-top">
-        @for (item of (contentAsArray()); track $index) {
-          @if( !item.type ) {
-            <li class="p-0 m-0 text-decoration-line-through">
-              <i class="fa-regular fa-square-check" style="font-size: 18px !important;"
-              (click)="$event.stopPropagation(); changeState($index)"></i> {{ item.txt }}
-            </li>
+          </tbody>
+      </table>
+      <table class="table table-borderless border-top {{textColor()}} mt-2">
+        <tbody>
+          @for (item of (contentAsArray()); track $index) {
+            @if( !item.type ) {
+              <tr class="">
+                <th scope="row" class="p-0 pe-2 bg-transparent {{textColor()}}">
+                  <i class="fa-regular fa-square-check text-decoration-line-through" style="font-size: 18px !important;"
+                  (click)="$event.stopPropagation(); changeState($index)"></i>
+                </th>
+                <td class="text-decoration-line-through p-0 bg-transparent {{textColor()}}">{{ item.txt }}</td>
+              </tr>
+            }
           }
-        }
-      </ul>
+        </tbody>
+      </table>
     }
   </div>
   <div class="position-relative card-footer mb-0">

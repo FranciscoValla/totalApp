@@ -24,6 +24,10 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'login',
+    loadComponent: () => import ( "./notesApp/pages/login/login").then ( (p) => p.Login),
+  },
+  {
     path: '**',
     redirectTo: 'dashboard'
   }

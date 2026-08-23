@@ -4,6 +4,7 @@ import { Note } from '../../interfaces/note.interface';
 import { NgClass } from '@angular/common';
 import { finalize, timeout } from 'rxjs';
 import { AlertInterface } from '../../pages/bin/bin';
+import { AlertServices } from '../../services/alert-services';
 
 @Component({
   selector: 'list-bin',
@@ -13,10 +14,10 @@ import { AlertInterface } from '../../pages/bin/bin';
 })
 export class LisBin {
   noteServices = inject(NoteServices);
+  alerService = inject(AlertServices);
   bin = input.required<Note>();
   binOutput = output<Note>();
   loadSignal = output<boolean>();
-  alertEmit = output<AlertInterface> ();
   isrestored = signal(false);
 
   textColor = computed(() => {
@@ -66,10 +67,7 @@ export class LisBin {
           }
         },
         error: () => {
-          this.alertEmit.emit({
-            type: 'bg-danger',
-            txt: 'Erorr al Borrar de Papelera.',
-          });
+          this.alerService.showAlert({type: 'bg-danger-subtle', txt: 'Erorr al Borrar de Papelera.'});
           this.loadSignal.emit(false);
         },
       });
@@ -84,10 +82,7 @@ export class LisBin {
           this.refreshBinList();
         },
         error: () => {
-          this.alertEmit.emit({
-            type: 'bg-danger',
-            txt: 'Erorr al restaurar Nota de Papelera.',
-          });
+          this.alerService.showAlert({type: 'bg-danger-subtle', txt: 'Erorr al restaurar Nota de Papelera.'});
           this.loadSignal.emit(false);
         },
       });
@@ -101,25 +96,16 @@ export class LisBin {
     ).subscribe({
       next: ()=> {
         if( this.isrestored()){
-          this.alertEmit.emit({
-            type: 'bg-success',
-            txt: 'Nota restaurada.',
-          });
+          this.alerService.showAlert({type: 'bg-success-subtle', txt: 'Nota restaurada.'});
         } else {
-          this.alertEmit.emit({
-            type: 'bg-danger',
-            txt: 'Nota Borrada Permanentemente',
-          });
+          this.alerService.showAlert({type: 'bg-danger-subtle', txt: 'Nota Borrada Permanentemente.'});
         }
         this.isrestored.set(false);
         this.loadSignal.emit(false);
 
       },
       error: () => {
-        this.alertEmit.emit({
-          type: 'bg-danger',
-          txt: 'Erorr al Obtener las Notas.',
-        });
+        this.alerService.showAlert({type: 'bg-danger-subtle', txt: 'Erorr al Obtener las Notas.'});
         this.loadSignal.emit(false);
       }
     })

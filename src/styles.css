@@ -1,9 +1,23 @@
-/* You can add global styles to this file, and also import other style files */
-body.modal-abierto,
-body.modal-abierto html,
-body.modal-abierto app-root, /* Tu componente principal de Angular */
-body.modal-abierto .contenedor-principal-de-tu-app { /* Reemplaza por la clase de tu div con scroll si tienes uno */
+body.modal-abierto {
   overflow: hidden !important;
   height: 100vh !important;
-  touch-action: none; /* Bloquea también el scroll táctil en celulares */
+}
+
+/* 2. 🔥 EL TRUCO MAESTRO: Buscamos la columna del contenido del Dashboard */
+body.modal-abierto .col-md-10 {
+  height: 100vh !important;   /* Le fijamos la altura al tamaño de la pantalla */
+  overflow: hidden !important; /* ¡Le cortamos el scroll por completo! */
+}
+
+/* 🚫 Bloqueo absoluto de scroll horizontal en toda la ventana */
+html, body {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* 🧱 Aseguramos que el contenedor principal de Angular no empuje el diseño */
+app-root {
+  display: block;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
 }

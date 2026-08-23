@@ -6,6 +6,7 @@ import { SelectColor } from '../select-color/select-color';
 import { finalize, timeout } from 'rxjs';
 import { AlertInterface } from '../../pages/bin/bin';
 import { CompressImage } from '../../services/compress-image';
+import { AlertServices } from '../../services/alert-services';
 
 @Component({
   selector: 'list-note',
@@ -16,10 +17,10 @@ import { CompressImage } from '../../services/compress-image';
 export class ListNote {
   noteServices = inject(NoteServices);
   compressServices = inject(CompressImage);
+  alerService = inject(AlertServices);
   note = input.required<Note>();
   noteOutput = output<Note>();
   loadSignal = output<boolean>();
-  alertEmit = output<AlertInterface>();
 
   isShowSelectColor = signal(false);
   imagenUrl = signal<string | null>(null);
@@ -60,7 +61,7 @@ export class ListNote {
     ).subscribe({
       next: () => this.addBin(),
       error: (err) => {
-        this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.')
+        this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al borrar Nota y mandar a Papelera.'});
         this.loadSignal.emit(false);
       },
     });
@@ -73,18 +74,18 @@ export class ListNote {
     ).subscribe({
       next: () => this.refreshNotes('bg-warning', 'Nota Borrada. Se Manda a Papelera.'),
       error: () =>
-        this.emitingAlert('bg-bg-danger', 'Error al borrar Nota y mandar a Papelera.')
+      this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al borrar Nota y mandar a Papelera.'})
     });
   }
 
   refreshNotes(type:string, txt:string) {
     this.noteServices.getNotesFireStore().subscribe({
       next: () => {
-        this.emitingAlert(type, txt);
+        this.alerService.showAlert({type:type, txt:txt});
         this.loadSignal.emit(false);
       },
       error: (err) => {
-        this.emitingAlert('bg-bg-danger', 'Error al Obtener las Notas.');
+        this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al Obtener las Notas.'});
         this.loadSignal.emit(false);
       },
     });
@@ -105,7 +106,7 @@ export class ListNote {
         this.refreshNotes('bg-success', 'Estado de la tarea actualizado.');
       },
       error: () => {
-        this.emitingAlert('bg-danger', 'Error al cambiar estado de la tarea.');
+        this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al cambiar estado de la tarea.'});
       }
     });
   }
@@ -120,7 +121,7 @@ export class ListNote {
         this.refreshNotes('bg-success', 'Se cambio Fijo/Normal.');
       },
       error: () =>
-        this.emitingAlert('bg-bg-danger', 'Error al Fijar/Normal')
+        this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al Fijar/Normal.'})
     });
   }
 
@@ -132,7 +133,7 @@ export class ListNote {
     };
     this.noteServices.updateNoteFireStore(updatedNote.id, { color: updatedNote.color}).subscribe({
       next: ()=> this.refreshNotes('bg-success', 'Cambio de Color Exitoso.'),
-      error: ()=> this.emitingAlert('bg-bg-danger', 'Error al Cambiar Color')
+      error: ()=> this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al Cambiar Color.'})
     })
   }
 
@@ -149,19 +150,13 @@ export class ListNote {
         }
         this.noteServices.updateNoteFireStore(updateImage.id, {img: updateImage.img}).subscribe({
           next: ()=> this.refreshNotes('bg-success', 'Cambio de Imagen Exitoso.'),
-          error: ()=> this.emitingAlert('bg-bg-danger', 'Error al Agregar/Cambiar Imagen')
+          error: ()=> this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al Agregar/Cambiar Imagen.'})
         })
       } catch {
-        this.emitingAlert('bg-bg-danger', 'Error Guardar Imagen');
+        this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error Guardar Imagen.'});
+
       }
     }
-  }
-
-  emitingAlert(type:string, txt:string) {
-    this.alertEmit.emit({
-      type: type,
-      txt: txt,
-    });
   }
 
   onEmit() {

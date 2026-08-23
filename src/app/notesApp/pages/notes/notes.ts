@@ -6,6 +6,7 @@ import { CreateNote } from '../../components/create-note/create-note';
 import { ListNote } from '../../components/list-note/list-note';
 import { ModalNote } from '../../components/modal-note/modal-note';
 import { AlertInterface } from '../bin/bin';
+import { AlertServices } from '../../services/alert-services';
 
 @Component({
   selector: 'app-notes',
@@ -17,13 +18,7 @@ export class Notes implements OnInit {
   noteModal = signal<Note | null>(null);
   showModal = signal(false);
   noteServices = inject(NoteServices);
-
-  isShowAlert = signal(false);
-  alertShow = signal<boolean>(false);
-  alert = signal<AlertInterface>({
-    type: '',
-    txt: '',
-  });
+  alertService = inject(AlertServices)
   load = signal(false);
 
   ngOnInit(): void {
@@ -31,10 +26,7 @@ export class Notes implements OnInit {
     this.noteServices.getNotesFireStore().subscribe({
       next: () => this.load.set(false),
       error: (err) => {
-        this.showAlert({
-          type: 'bg-danger',
-          txt: 'Erorr al Obtener las Notas.',
-        });
+        this.alertService.showAlert({type:'bg-danger-subtle', txt:'Erorr al Obtener las Notas.'})
       },
     });
   }
@@ -53,19 +45,4 @@ export class Notes implements OnInit {
     return this.noteServices.noteList().filter((note) => !note.fix)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
-
-  showAlert(alert: AlertInterface) {
-    this.alert.set({
-      type: alert.type,
-      txt: alert.txt,
-    });
-    this.alertShow.set(true);
-    setTimeout(() => {
-      this.alertShow.set(false);
-      this.alert.set({
-        type: '',
-        txt: '',
-      });
-    }, 5000);
-  }
 }
