@@ -37,10 +37,13 @@
 </div>
 
 <!-- Simplificado: Eliminamos el @if estructural -->
-<modal-note  [class.d-none]="!showModal()"
-[noteInput]="noteModal()!"
-[isModalOpen]="showModal()"
-(loadSignal)="load.set($event)"
-(emitClose)="showModal.set(false);
-noteModal.set(null);" class="position-absolute top-50 start-50"></modal-note>
+<div class="row">
+  <modal-note
+  [class.d-none]="!showModal()"
+  [noteInput]="noteModal()!"
+  [isModalOpen]="showModal()"
+  (loadSignal)="load.set($event)"
+  (emitClose)="showModal.set(false);
+  noteModal.set(null);"></modal-note>
+</div>
 <!-- } -->

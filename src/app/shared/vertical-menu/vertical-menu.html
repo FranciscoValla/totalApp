@@ -10,7 +10,7 @@
   </li>
   <br><br>
   <li>
-    @if (tokenAuthRefresh() !== '') {
+    @if (refreshTokenAuth() !== '') {
       <a class="nav-link text-dark py-3 px-4 rounded" (click)="logOut();">
         <i class="fa-solid fa-right-from-bracket"></i>Cerrar Sesion
       </a>

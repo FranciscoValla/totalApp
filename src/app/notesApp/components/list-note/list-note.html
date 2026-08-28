@@ -1,14 +1,14 @@
-<div class="card border border-secondary-subtle rounded p-0" [ngClass]="note().color">
-  <div class="card-header align-items-center p-2 {{textColor()}}"
+<div class="card rounded p-0 {{note().color}}" [ngClass]="note().color === 'bg-white' ? 'border border-dark' : 'border border-0' " >
+  <div class="card-header align-items-center p-0 {{textColor()}}"
     style="cursor: p; font-size: 20px !important; font-weight: 600;" (click)="onEmit()">
     @if(note().img) {
-      <div class="col-12">
-        <img [src]="note().img" class="w-100 img-base">
+      <div class="col-12 rounded">
+        <img [src]="note().img" class="w-100 img-base rounded">
       </div>
     }
-    {{note().title}}
+    <p class="m-0 p-0 px-3 pt-2">{{note().title}}</p>
   </div>
-  <div class="card-body pt-0 p-2" style="cursor: p;" (click)="onEmit()">
+  <div class="card-body p-3" style="cursor: p;" (click)="onEmit()">
     @if ( !isArray() ) {
       <p class="card-text {{textColor()}}">{{note().content}}</p>
     } @else {
@@ -17,7 +17,7 @@
           @for (item of (contentAsArray()); track $index) {
             @if( item.type ) {
               <tr>
-                <th scope="row" class="p-0 m-0 p-0 pe-2 bg-transparent {{textColor()}}">
+                <th class="p-0 m-0 bg-transparent {{textColor()}}" style="width: 26px !important;">
                   <i class="fa-regular fa-square" style="font-size: 18px !important;"
                   (click)="$event.stopPropagation(); changeState($index)"></i>
                 </th>
@@ -32,7 +32,7 @@
           @for (item of (contentAsArray()); track $index) {
             @if( !item.type ) {
               <tr class="">
-                <th scope="row" class="p-0 pe-2 bg-transparent {{textColor()}}">
+                <th scope="row" class="p-0 m-0 bg-transparent {{textColor()}}" style="width: 26px !important;">
                   <i class="fa-regular fa-square-check text-decoration-line-through" style="font-size: 18px !important;"
                   (click)="$event.stopPropagation(); changeState($index)"></i>
                 </th>
@@ -44,37 +44,12 @@
       </table>
     }
   </div>
-  <div class="position-relative card-footer mb-0">
-    <div class="row px-2">
-      <div class="col-2 d-flex justify-content-center align-items-center position-relative rounded"
-      (click)="isShowSelectColor.set(true)"
-      data-bs-toggle="tooltip" data-bs-placement="top"  title="Cambiar Color Fondo">
-        <i class="fa-solid fa-palette {{textColor()}} p-2"></i>
-        @if (isShowSelectColor()) {
-        <select-color
-        (hideSelect)="isShowSelectColor.set(false)"
-        (colorSelectOutput)="changeColor($event)"
-        [colorInput]="note().color!"></select-color>
-        }
-      </div>
-      <div class="col-2 d-flex justify-content-center align-items-center rounded" (click)=" updateNoteFix();"
-      data-bs-toggle="tooltip" data-bs-placement="top"  title="Fijar/DesFijar Nota">
-        <i class="fa-solid {{textColor()}} p-2"
-        [ngClass]="note().fix ? 'fa-thumbtack' : 'fa-thumbtack-slash'"></i>
-      </div>
-      <div class="col-2 d-flex justify-content-center align-items-center rounded"
-      data-bs-toggle="tooltip" data-bs-placement="top"  title="Agregar Imagen">
-        <label for="seleccionar-imagen" class="icono-carga-contenedor m-0">
-          <i class="fa-solid fa-image {{textColor()}} p-2" style="cursor: pointer; font-size: 18px;"></i>
-        </label>
-        <input type="file" id="seleccionar-imagen" class="d-none" accept="image/*" (change)="onFileSelected($event)">
-      </div>
-      <div class="offset-3 offset-md-4 col-2 d-flex justify-content-center align-items-center rounded"
-      (click)="$event.stopPropagation(); deleteNote(note().id);"
-      data-bs-toggle="tooltip" data-bs-placement="top"  title="Borrar Nota">
-        <i class="fa-solid fa-trash {{textColor()}} p-2"
-        style="cursor: pointer; font-size: 16px !important;"></i>
-      </div>
-    </div>
+  <div class="position-relative card-footer p-0 m-0 pb-1">
+    <atom-footer
+    [noteInput]="note()"
+    [isList]="true"
+    (refresOutput)="refreshNotes($event.type, $event.txt)"
+    /* (updateOutput)="noteCurrent.set($event)" */
+    (loadOutput)="loadSignal.emit($event)"></atom-footer>
   </div>
 </div>

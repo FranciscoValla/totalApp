@@ -1,0 +1,27 @@
+<div class="row mx-2">
+  <div class="col-2 col-md-1 d-flex justify-content-center align-items-center position-relative rounded"
+    (click)="isShowSelectColor.set(true)" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="top"
+    title="Cambiar Color Fondo">
+    <i class="fa-solid fa-palette {{textColor()}} p-2"></i>
+    @if (isShowSelectColor()) {
+    <select-color (hideSelect)="isShowSelectColor.set(false)" (colorSelectOutput)="updateColor($event)"
+      [colorInput]="noteCurrent().color!"></select-color>
+    }
+  </div>
+  <div class="col-2 col-md-1 d-flex justify-content-center align-items-center rounded" (click)="updateNoteFix();"
+    style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="Fijar/DesFijar Nota">
+    <i class="fa-solid {{textColor()}} p-2" [ngClass]="noteCurrent().fix ? 'fa-thumbtack' : 'fa-thumbtack-slash'"></i>
+  </div>
+  <div class="col-2 col-md-1 d-flex justify-content-center align-items-center position-relative rounded"
+    data-bs-toggle="tooltip" data-bs-placement="top" title="Cambiar/Agregar Imagen" style="overflow: hidden;">
+    <i class="fa-solid fa-image {{textColor()}} p-2" style="cursor: pointer; font-size: 18px;"></i>
+    <input type="file" id="seleccionar-imagen" class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+      accept="image/*" style="cursor: pointer;" (click)="$event.stopPropagation()"
+      (change)="$event.stopPropagation(); onFileSelected($event)" />
+  </div>
+  <div class="offset-1 col-2 col-md-1 d-flex justify-content-center align-items-center rounded"
+    (click)="$event.stopPropagation(); deleteNote(noteCurrent().id);" style="cursor: pointer;" data-bs-toggle="tooltip"
+    data-bs-placement="top" title="Borrar Nota">
+    <i class="fa-solid fa-trash {{textColor()}} p-2" style="cursor: pointer; font-size: 16px !important;"></i>
+  </div>
+</div>

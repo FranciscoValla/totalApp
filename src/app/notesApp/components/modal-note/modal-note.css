@@ -30,11 +30,16 @@
   outline: none;
   resize: none;
   font: inherit;
-  color: inherit;
+  color: black !important;
   padding: 0;
   margin: 0;
   -webkit-appearance: none;
   appearance: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  height: auto;
+  display: block;
 }
 
 .new-note p {
@@ -44,13 +49,25 @@
   text-align: end !important;
 }
 
-.card-footer .col-2:hover, .card-footer .col-md-1:hover {
-  background-color: color-mix(in srgb, var(--bs-secondary-bg-subtle) 50%, transparent) !important;
+.card-body {
+  max-height: calc(100dvh - 128px) !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.card-body::-webkit-scrollbar {
+  width: 6px;                  /* Una barra muy delgada para que no tape tus textos */
+}
+
+.card-body::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* Color gris translúcido suave */
+  border-radius: 4px;
 }
 
 /* --- imagen preview ---  */
 .img-base {
-  max-height: 350px;
+  max-height: 300px !important;
+  max-width: 300px !important;
   overflow: hidden;
   background-color: transparent;
   object-fit: contain;

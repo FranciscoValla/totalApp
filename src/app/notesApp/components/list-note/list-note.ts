@@ -2,15 +2,14 @@ import { Component, computed, effect, inject, input, output, signal } from '@ang
 import { Note } from '../../interfaces/note.interface';
 import { NoteServices } from '../../services/notes';
 import { NgClass } from '@angular/common';
-import { SelectColor } from '../select-color/select-color';
 import { finalize, timeout } from 'rxjs';
-import { AlertInterface } from '../../pages/bin/bin';
 import { CompressImage } from '../../services/compress-image';
 import { AlertServices } from '../../services/alert-services';
+import { Footer } from "../../atoms/footer/footer";
 
 @Component({
   selector: 'list-note',
-  imports: [NgClass, SelectColor],
+  imports: [NgClass, Footer],
   templateUrl: './list-note.html',
   styleUrl: './list-note.css',
 })
@@ -22,7 +21,6 @@ export class ListNote {
   noteOutput = output<Note>();
   loadSignal = output<boolean>();
 
-  isShowSelectColor = signal(false);
   imagenUrl = signal<string | null>(null);
 
   textColor = computed(() => {
@@ -109,54 +107,6 @@ export class ListNote {
         this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al cambiar estado de la tarea.'});
       }
     });
-  }
-
-  updateNoteFix() {
-    const updateNote: Note = {
-      ...this.note(),
-      fix: !this.note().fix,
-    };
-    this.noteServices.updateNoteFireStore(updateNote.id, { fix: updateNote.fix }).subscribe({
-      next: () => {
-        this.refreshNotes('bg-success', 'Se cambio Fijo/Normal.');
-      },
-      error: () =>
-        this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al Fijar/Normal.'})
-    });
-  }
-
-  changeColor(newColor: string) {
-    const currentNote = this.note();
-    const updatedNote: Note = {
-      ...currentNote,
-      color: newColor,
-    };
-    this.noteServices.updateNoteFireStore(updatedNote.id, { color: updatedNote.color}).subscribe({
-      next: ()=> this.refreshNotes('bg-success', 'Cambio de Color Exitoso.'),
-      error: ()=> this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al Cambiar Color.'})
-    })
-  }
-
-  async onFileSelected(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const archivo = input.files[0];
-      try {
-        const imageCompressBase64 = await this.compressServices.compressFile(archivo, 1200, 0.6);
-        this.imagenUrl.set(imageCompressBase64);
-        const currentNote = this.note();
-        const updateImage:Note = {
-          ...currentNote, img: imageCompressBase64
-        }
-        this.noteServices.updateNoteFireStore(updateImage.id, {img: updateImage.img}).subscribe({
-          next: ()=> this.refreshNotes('bg-success', 'Cambio de Imagen Exitoso.'),
-          error: ()=> this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error al Agregar/Cambiar Imagen.'})
-        })
-      } catch {
-        this.alerService.showAlert({type:'bg-danger-subtle', txt:'Error Guardar Imagen.'});
-
-      }
-    }
   }
 
   onEmit() {

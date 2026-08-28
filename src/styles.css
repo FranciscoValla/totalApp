@@ -10,9 +10,9 @@ body.modal-abierto .col-md-10 {
 }
 
 /* 🚫 Bloqueo absoluto de scroll horizontal en toda la ventana */
-html, body {
+html, body, app-root {
   max-width: 100% !important;
-  overflow-x: hidden !important;
+  height: 100vh;
 }
 
 /* 🧱 Aseguramos que el contenedor principal de Angular no empuje el diseño */

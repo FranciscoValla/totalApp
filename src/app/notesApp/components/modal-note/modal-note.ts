@@ -3,25 +3,25 @@ import {
   computed,
   DOCUMENT,
   effect,
+  ElementRef,
   inject,
   input,
   linkedSignal,
   output,
   signal,
+  viewChildren,
 } from '@angular/core';
 import { Note } from '../../interfaces/note.interface';
 import { FormsModule } from '@angular/forms';
 import { NoteServices } from '../../services/notes';
 import { NgClass } from '@angular/common';
-import { SelectColor } from '../select-color/select-color';
-import { CompressImage } from '../../services/compress-image';
-import { AlertInterface } from '../../pages/bin/bin';
-import { finalize, timeout } from 'rxjs';
 import { AlertServices } from '../../services/alert-services';
+import { Footer } from "../../atoms/footer/footer";
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 @Component({
   selector: 'modal-note',
-  imports: [FormsModule, NgClass, SelectColor],
+  imports: [FormsModule, NgClass, Footer, CdkTextareaAutosize],
   templateUrl: './modal-note.html',
   styleUrl: './modal-note.css',
 })
@@ -31,10 +31,12 @@ export class ModalNote {
   alerService = inject(AlertServices);
   emitClose = output();
   noteServices = inject(NoteServices);
-  iCompService = inject(CompressImage);
-  isShowSelectColor = signal(false);
-  loadSignal = output<boolean>();
 
+  loadSignal = output<boolean>();
+  contentArray = linkedSignal<{ type: boolean; txt: string }[]>( ()=> {
+    return Array.isArray(this.noteCurrent().content) ? (this.noteCurrent().content as {type: boolean; txt:string}[]): [];
+  });
+  elementosInput = viewChildren<ElementRef<HTMLInputElement>>('notaInput');
   textColor = computed(() => {
     switch (this.noteCurrent().color) {
       case 'bg-primary':
@@ -61,11 +63,6 @@ export class ModalNote {
     }
   });
 
-  contentAsArray = computed<{ type: boolean; txt: string }[]>(() => {
-    const content = this.noteCurrent().content;
-    return Array.isArray(content) ? (content as { type: boolean; txt: string }[]) : [];
-  });
-
   private document = inject(DOCUMENT);
   isModalOpen = input<boolean>(false);
   constructor() {
@@ -76,6 +73,27 @@ export class ModalNote {
         this.document.body.classList.remove('modal-abierto');
       }
     });
+  }
+
+  onEnter(event: Event) {
+    event.preventDefault();
+    this.contentArray.update((lista) => [...lista, { type: true, txt: '' }]);
+    this.noteCurrent.update( list => ({
+      ...list, content: this.contentArray()
+    }));
+    setTimeout(() => {
+      const inputs = this.elementosInput();
+      if (inputs.length > 0) {
+        inputs[inputs.length - 1].nativeElement.focus();
+      }
+    }, 10);
+  }
+
+  deleteList(indexDelete:number){
+    this.contentArray.update( (list)=> list.filter( (_item, index) => index !== indexDelete));
+    this.noteCurrent.update( list => ({
+      ...list, content: this.contentArray()
+    }));
   }
 
   changeState( indexTarget:number) {
@@ -93,68 +111,18 @@ export class ModalNote {
     }));
   }
 
-  updateNoteFix() {
-    this.noteCurrent.update((current) => ({
-      ...current,
-      fix: !current.fix,
-    }));
-  }
-
-  updateColor(newColor: string) {
-    this.noteCurrent.update((current) => ({
-      ...current,
-      color: newColor,
-    }));
-  }
-
-  async onFileSelected(event: Event):Promise<void> {
-    event.stopPropagation();
-    event.preventDefault();
-    const inputElement = event.target as HTMLInputElement;
-    if (inputElement.files && inputElement.files[0]) {
-      const file = inputElement.files[0];
-      try {
-        const imageCompressBase64 = await this.iCompService.compressFile(file, 1200, 0.4);
-        this.noteCurrent.update((current) => ({
-        ...current,
-        img: imageCompressBase64,
-      }));
-      } catch {
+  onClose( event?: Event) {
+    if (event) {
+      const target = event.target as HTMLElement;
+      if (target.closest('.card')) {
+        return;
       }
-      inputElement.value = '';
-    }
-  }
-
-  deleteNote(id: string) {
-    this.noteServices.deleteNoteFireStore(id).pipe(
-      timeout(6000),
-      finalize(() => {}),
-    ).subscribe({
-      next: () => this.addBin(),
-      error: (err) => {
-        this.emitingAlert('bg-danger-subtle', 'Error al borrar Nota y mandar a Papelera.');
-        this.onClose();
-      },
-    });
-  }
-
-    addBin() {
-      this.noteServices.addListBinFireStore(this.noteInput()).pipe(
-        timeout(6000),
-        finalize(() => {}),
-      ).subscribe({
-        next: () => this.refreshNotes('bg-warning-subtle', 'Nota Borrada. Se Manda a Papelera.'),
-        error: () => {
-          this.emitingAlert('bg-danger-subtle', 'Error al borrar Nota y mandar a Papelera.');
-          this.onClose();
-        }
-      });
     }
 
-  onClose() {
     this.loadSignal.emit(true);
     const originalNote = this.noteInput();
     const actualNote = this.noteCurrent();
+    actualNote.content = Array.isArray(actualNote.content) ? this.contentArray() : actualNote.content;
     const update:Partial<Note> = {};
     const isUpload = signal(false);
     if ( originalNote.title !== actualNote.title){
@@ -203,8 +171,8 @@ export class ModalNote {
     this.noteServices.getNotesFireStore().subscribe({
       next: () => {
         this.emitingAlert(type, txt);
-        // this.onClose()
         this.emitClose.emit();
+        this.loadSignal.emit(false);
       },
       error: () => {
         this.emitingAlert('bg-danger-subtle', 'Error al Actualizar la Nota.');

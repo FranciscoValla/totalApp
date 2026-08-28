@@ -31,13 +31,15 @@ export class SelectColor {
     })
   }
 
-  @HostListener('document:click', ['$event'])
-  onclickOutside(event: MouseEvent) {
-    const clickedInside = this.elementRef.nativeElement.contains(event.target);
-    if (!clickedInside) {
-      this.hideSelect.emit();
-    }
+  @HostListener('window:click', ['$event']) // 💡 Escucha la ventana global
+onclickOutside(event: MouseEvent) {
+  const clickedInside = this.elementRef.nativeElement.contains(event.target);
+  console.log('>>> Clic dentro del átomo:', clickedInside);
+
+  if (!clickedInside) {
+    this.hideSelect.emit();
   }
+}
 
   changueColor () {
     this.colorSelectOutput.emit(this.colorSelecionado());

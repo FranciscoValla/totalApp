@@ -19,11 +19,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
   return next(clonedReq).pipe(
     catchError((error: HttpErrorResponse) => {
-
       // Si el servidor nos dice 401 (Tu token venció), intentamos el salvavidas automático
       if (error.status === 401 && localStorage.getItem('refreshTokenAuth')) {
         console.log('El token de 1 hora caducó. Renovando sesión en segundo plano...');
-
         // Ejecutamos la renovación automática
         return authService.refreshToken().pipe(
           switchMap((response) => {

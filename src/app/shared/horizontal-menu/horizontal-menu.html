@@ -1,15 +1,24 @@
 <ul class="nav justify-content-center">
   <li class="nav-item m-0">
-    <a class="nav-link text-dark" routerLink="/dashboard/notes" routerLinkActive="bg-primary-subtle" [routerLinkActiveOptions]="{exact:true}">
+    <a class="nav-link text-dark rounded" routerLink="/dashboard/notes" routerLinkActive="bg-primary-subtle" [routerLinkActiveOptions]="{exact:true}">
       <i class="fa-solid fa-pen"></i>Notas</a>
   </li>
   <li class="nav-item m-0">
-    <a class="nav-link text-dark" routerLink="/dashboard/reminders" routerLinkActive="bg-primary-subtle" [routerLinkActiveOptions]="{exact:true}">
-      <i class="fa-solid fa-clock"></i>Recordatorio</a>
-  </li>
-  <li class="nav-item m-0">
-    <a class="nav-link text-dark" routerLink="/dashboard/bin" routerLinkActive="bg-primary-subtle" [routerLinkActiveOptions]="{exact:true}">
+    <a class="nav-link text-dark rounded" routerLink="/dashboard/bin" routerLinkActive="bg-primary-subtle" [routerLinkActiveOptions]="{exact:true}">
       <i class="fa-solid fa-trash"></i>Papelera
     </a>
+  </li>
+
+  <li class="d-flex nav-item m-0">
+    @if (refreshTokenAuth() !== '') {
+      <a class="nav-link text-dark rounded" (click)="logOut();">
+        <i class="fa-solid fa-right-from-bracket"></i>Cerrar Sesion
+      </a>
+    }
+    @else {
+      <a class="nav-link text-dark rounded" routerLink="/login" routerLinkActive="bg-primary-subtle" [routerLinkActiveOptions]="{exact:true}">
+        <i class="fa-solid fa-user"></i>Iniciar sesion
+      </a>
+    }
   </li>
 </ul>

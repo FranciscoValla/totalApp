@@ -21,7 +21,7 @@ export class AuthServices {
       tap( response => {
         console.log('>>> Response:', response);
         localStorage.setItem('tokenAuth', response.idToken);
-        localStorage.setItem('tokenAuthRefresh', response.refreshToken)
+        localStorage.setItem('refreshTokenAuth', response.refreshToken)
         this.currentUserToken.set(response.idToken);
       })
     );
@@ -29,7 +29,7 @@ export class AuthServices {
 
   refreshToken (): Observable<any> {
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${this.apiKey}`;
-    const savedRefreshToken = localStorage.getItem('tokenAuthRefresh');
+    const savedRefreshToken = localStorage.getItem('refreshTokenAuth');
     const bodyRefresh = {
       grant_type: 'refresh_token',
       refreshToken: savedRefreshToken
@@ -43,7 +43,7 @@ export class AuthServices {
 
   logOutEmail () {
     localStorage.removeItem('tokenAuth');
-    localStorage.removeItem('tokenAuthRefresh')
+    localStorage.removeItem('refreshTokenAuth')
     this.currentUserToken.set('');
   }
 }

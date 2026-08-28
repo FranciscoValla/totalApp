@@ -2,13 +2,16 @@ import { effect, inject, Service, signal } from '@angular/core';
 import { Note } from '../interfaces/note.interface';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
-import { map, Observable, tap } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { mapFireSToNote, mapResponseFireSc } from '../mapper/note.mapper';
 
 @Service()
 export class NoteServices {
   public noteList = signal<Note[]>([]);
   public binList = signal<Note[]>([]);
+
+  public noteListLocal = signal<Note[]>([]);
+  public binListLocal = signal<Note[]>([]);
 
   deleteAllBin() {
     this.binList.set([]);
@@ -20,6 +23,13 @@ export class NoteServices {
   private binCollection = environment.collectionBins;
 
   getNotesFireStore(): Observable<Note[]> {
+    if( !localStorage.getItem('refreshTokenAuth')){
+      console.log('>>>Entro en local');
+      const notes = JSON.parse(localStorage.getItem('localNotes') || '[]' );
+      console.log('>>>Notes', notes);
+      this.noteList.set(notes);
+      return of(notes);
+    }
     return this.http.get<{ documents: any[] }>(`${this.baseUrl}/${this.noteCollection}`).pipe(
       map(mapResponseFireSc),
       tap((list) => {
@@ -29,6 +39,14 @@ export class NoteServices {
   }
 
   createNoteFireStore(newNote: Note): Observable<Note> {
+    if ( !localStorage.getItem('refreshTokenAuth')){
+      const noteActual:Note[] = JSON.parse(localStorage.getItem('localNotes') || '[]');
+      const noteWithId = {...newNote, id: 'local_' + Math.random().toString(36).substring(2,9)};
+      const newList = [...noteActual, noteWithId];
+      localStorage.setItem('localNotes', JSON.stringify(newList));
+      // this.noteList.set(notesSave);
+      return of(noteWithId);
+    }
     const bodyFirestore = this.returnFireStoreFormat(newNote);
     return this.http.post<any>(`${this.baseUrl}/${this.noteCollection}`, bodyFirestore).pipe(
       map(mapFireSToNote),
@@ -36,6 +54,18 @@ export class NoteServices {
   }
 
   updateNoteFireStore(id: string, updateNote: Partial<Note>): Observable<Note> {
+    if( !localStorage.getItem('refreshTokenAuth')){
+      const noteListTemp: Note[] = JSON.parse(localStorage.getItem('localNotes') || '[]');
+      const newList = noteListTemp.map( note => {
+        if ( note.id === id) {
+          return { ...note, ...updateNote}
+        }
+        return note
+      });
+      localStorage.setItem('localNotes', JSON.stringify(newList));
+      const actualNote = newList.find( n => n.id === id) as Note;
+      return of(actualNote);
+    }
     const urlConId = `${this.baseUrl}/${this.noteCollection}/${id}`;
     const fields: any = {};
     const queryParams: string[] = [];
@@ -87,11 +117,24 @@ export class NoteServices {
   }
 
   deleteNoteFireStore(id: string): Observable<void> {
+    if ( !localStorage.getItem('refreshTokenAuth')){
+      const localListTemp:Note[] = JSON.parse(localStorage.getItem('localNotes') || '[]');
+      const noteListTemp = localListTemp.filter((item)=> item.id !== id);
+      localStorage.setItem('localNotes', JSON.stringify(noteListTemp));
+      // this.noteListLocal.set(noteListTemp);
+      return of(void 0);
+    }
     const urlConId = `${this.baseUrl}/${this.noteCollection}/${id}`;
     return this.http.delete<void>(urlConId);
   }
 
   addListBinFireStore( bin: Note): Observable<Note> {
+    if( !localStorage.getItem('refreshTokenAuth')){
+      const binListLocal = JSON.parse( localStorage.getItem('localBin') || '[]');
+      const actualBin = [...binListLocal, bin];
+      localStorage.setItem('localBin', JSON.stringify(actualBin));
+      return of(bin);
+    }
     const bodyFirestore = this.returnFireStoreFormat(bin);
     return this.http.post<any>(`${this.baseUrl}/${this.binCollection}`, bodyFirestore).pipe(
       map(mapFireSToNote),
@@ -99,6 +142,11 @@ export class NoteServices {
   }
 
   getBinsFireStore(): Observable<Note[]> {
+    if( !localStorage.getItem('refreshTokenAuth')){
+      const bins = JSON.parse(localStorage.getItem('localBin') || '[]');
+      this.binList.set(bins);
+      return of(bins);
+    }
     return this.http.get<{ documents: any[] }>(`${this.baseUrl}/${this.binCollection}`).pipe(
       map(mapResponseFireSc),
       tap((list) => {
@@ -108,6 +156,12 @@ export class NoteServices {
   }
 
   deleteBinFirestore(id: string): Observable<void> {
+    if( !localStorage.getItem('refreshTokenAuth')){
+      const binListTemp:Note[] = JSON.parse(localStorage.getItem('localBin') || '[]');
+      const actualBin = binListTemp.filter( (item)=> item.id !== id);
+      localStorage.setItem('localBin', JSON.stringify(actualBin));
+      return of(void 0);
+    }
     return this.http.delete<void>(`${this.baseUrl}/${this.binCollection}/${id}`);
   }
 

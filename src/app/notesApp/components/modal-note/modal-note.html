@@ -1,80 +1,94 @@
-<div class="custom-modal-overlay" (click)="onClose()">
-  <div class="row justify-content-center">
-    <div class="col-11 col-md-10">
-      <div class="card border border-0 rounded p-0 shadow" [ngClass]="noteCurrent().color"
-      (click)="$event.stopPropagation()">
-        <div class="card-header align-items-center p-2 {{textColor()}}"
-          style="cursor: pointer; font-size: 24px !important; font-weight: 600;">
-          @if(noteCurrent().img) {
-          <div class="col-12">
-            <img [src]="noteCurrent().img" class="w-100 rounded img-base">
-          </div>
-          }
-          <textarea type="text" placeholder="Titulo..." style="font-size: 24px;" [(ngModel)]="noteCurrent().title"
-            class="col-12 {{textColor()}}" rows="1"
-            data-bs-toggle="tooltip" data-bs-placement="top"  title="Escribe para cambiar el título"> </textarea>
-        </div>
-        <div class="card-body pt-0 p-2" style="cursor: pointer;">
-          @if ( !isArray()) {
+<div class="custom-modal-overlay" (click)="onClose($event)">
+  <div class="container-fluid d-flex align-items-start justify-content-center h-100 pt-3">
+    <div class="row w-100 justify-content-center">
+      <div class="col-11 col-sm-8 col-md-6">
+        <div class="card border border-0 rounded p-0 shadow" [ngClass]="noteCurrent().color">
+          <div class="card-body pt-0 p-2" style="cursor: pointer;">
+            @if(noteCurrent().img) {
+            <div class="col-12 rounded text-center">
+              <img [src]="noteCurrent().img" class="w-100 rounded img-base">
+            </div>
+            }
+            <textarea type="text" placeholder="Titulo..." style="font-size: 24px;" [(ngModel)]="noteCurrent().title"
+            class="col-12 {{textColor()}}" rows="1" data-bs-toggle="tooltip" data-bs-placement="top"
+            title="Escribe para cambiar el título"> </textarea>
+            @if ( !isArray()) {
             <textarea type="text" placeholder="Añade una nota..." style="font-size: 16px;" class="w-100 {{textColor()}}"
-            [rows]="5" [(ngModel)]="noteCurrent().content"
-            data-bs-toggle="tooltip" data-bs-placement="top"  title="Escribe para cambiar la Nota"></textarea>
-          } @else {
-            <ul class="card-text {{textColor()}} p-0 m-0 list-unstyled">
-              @for (item of (contentAsArray()); track $index) {
+            [rows]="5" [(ngModel)]="noteCurrent().content" data-bs-toggle="tooltip" data-bs-placement="top"
+            title="Escribe para cambiar la Nota"></textarea>
+            } @else {
+            <table class="table table-borderless">
+              <tbody>
+                @for (item of (contentArray()); track $index) {
                 @if( item.type ) {
-                  <li class="p-0 m-0">
+                <tr>
+                  <th scope="row" class="p-0 m-0 p-0 pe-0 bg-transparent {{textColor()}}" style="width: 26px !important;">
                     <i class="fa-regular fa-square" style="font-size: 18px !important;"
-                    (click)="$event.stopPropagation(); changeState($index)"></i> {{ item.txt }}
-                  </li>
+                    (click)="$event.stopPropagation(); changeState($index)"></i>
+                  </th>
+                  <td class="p-0 m-0 bg-transparent {{textColor()}}">
+                    <textarea #notaInput
+                    cdkTextareaAutosize
+                    class="form-control bg-transparent border-0 shadow-none p-0 w-100 {{textColor()}}"
+                    rows="1"
+                    placeholder="Escribe aquí la nota..."
+                    [(ngModel)]="contentArray()[$index].txt"
+                    (keydown.enter)="onEnter($event)">
+                    </textarea>
+                  </td>
+                  <td class="p-0 bg-transparent {{textColor()}} text-center" (click)="deleteList($index)">
+                    <i class="fa-solid fa-xmark inline-block" style="font-size: 24px !important;"></i>
+                  </td>
+                </tr>
                 }
-              }
-            </ul>
-            <ul class="card-text {{textColor()}} p-0 pt-1 m-0 mt-1 list-unstyled opacity-50 border-top">
-              @for (item of (contentAsArray()); track $index) {
+                }
+                <tr class="opacity-75">
+                  <th scope="row" class="p-0 m-0 pe-0 bg-transparent {{textColor()}} align-middle" style="width: 26px !important;">
+                    <i class="fa-solid fa-plus" style="font-size: 18px !important;"></i>
+                  </th>
+                  <td class="p-0 m-0 bg-transparent">
+                    <!-- Usamos un textarea falso que al recibir el clic/focus dispara el onEnter de inmediato -->
+                    <textarea
+                      class="form-control bg-transparent border-0 shadow-none p-0 w-100 {{textColor()}}"
+                      rows="1"
+                      placeholder="Agregar Item a la lista..."
+                      readonly
+                      (click)="$event.stopPropagation(); onEnter($event)">
+                    </textarea>
+                  </td>
+                  <td class="p-0 bg-transparent"></td> <!-- Celda vacía para mantener la simetría de la tabla -->
+                </tr>
+              </tbody>
+            </table>
+            <table class="table table-borderless border-top {{textColor()}} mt-2">
+              <tbody>
+                @for (item of (contentArray()); track $index) {
                 @if( !item.type ) {
-                  <li class="p-0 m-0 text-decoration-line-through">
-                    <i class="fa-regular fa-square-check" style="font-size: 18px !important;"
-                    (click)="$event.stopPropagation(); changeState($index)"></i> {{ item.txt }}
-                  </li>
+                <tr class="">
+                  <th scope="row" class="p-0 pe-2 bg-transparent {{textColor()}}" style="width: 26px !important;">
+                    <i class="fa-regular fa-square-check text-decoration-line-through"
+                    style="font-size: 18px !important;" (click)="$event.stopPropagation(); changeState($index)"></i>
+                  </th>
+                  <td class="text-decoration-line-through p-0 bg-transparent {{textColor()}}">{{ item.txt }}</td>
+                </tr>
                 }
-              }
-            </ul>
-          }
-        </div>
-        <div class="position-relative card-footer text-end">
-          <div class="row px-2">
-            <div class="col-2 col-md-1 d-flex justify-content-center align-items-center position-relative rounded"
-            (click)="isShowSelectColor.set(true)" style="cursor: pointer;"
-                data-bs-toggle="tooltip" data-bs-placement="top"  title="Cambiar Color Fondo">
-              <i class="fa-solid fa-palette {{textColor()}} p-2"></i>
-              @if (isShowSelectColor()) {
-              <select-color (hideSelect)="isShowSelectColor.set(false)" (colorSelectOutput)="updateColor($event)"
-                [colorInput]="noteCurrent().color!"></select-color>
-              }
-            </div>
-            <div class="col-2 col-md-1 d-flex justify-content-center align-items-center rounded"
-            (click)="updateNoteFix();" style="cursor: pointer;"
-            data-bs-toggle="tooltip" data-bs-placement="top"  title="Fijar/DesFijar Nota">
-              <i class="fa-solid {{textColor()}} p-2"
-                [ngClass]="noteCurrent().fix ? 'fa-thumbtack' : 'fa-thumbtack-slash'"></i>
-            </div>
-            <div class="col-2 col-md-1 d-flex justify-content-center align-items-center position-relative rounded"
-            data-bs-toggle="tooltip" data-bs-placement="top"  title="Cambiar/Agregar Imagen"
-              style="overflow: hidden;">
-              <i class="fa-solid fa-image {{textColor()}} p-2" style="cursor: pointer; font-size: 18px;"></i>
-              <input type="file" id="seleccionar-imagen" class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
-                accept="image/*" style="cursor: pointer;" (click)="$event.stopPropagation()"
-                (change)="$event.stopPropagation(); onFileSelected($event)" />
-            </div>
-            <div class="offset-4 col-2 offset-md-8 col-md-1 d-flex justify-content-center align-items-center rounded"
-            (click)="$event.stopPropagation(); deleteNote(noteCurrent().id);" style="cursor: pointer;"
-            data-bs-toggle="tooltip" data-bs-placement="top"  title="Borrar Nota">
-              <i class="fa-solid fa-trash {{textColor()}} p-2" style="cursor: pointer; font-size: 16px !important;"></i>
-            </div>
+                }
+              </tbody>
+            </table>
+            }
+          </div>
+          <div class="position-relative card-footer">
+            <atom-footer
+            [noteInput]="noteCurrent()"
+            (closeOutput)="onClose();"
+            (refresOutput)="refreshNotes($event.type, $event.txt)"
+            (updateOutput)="noteCurrent.set($event)"
+            (loadOutput)="loadSignal.emit($event)"></atom-footer>
           </div>
         </div>
       </div>
+
     </div>
   </div>
+
 </div>

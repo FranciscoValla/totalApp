@@ -1,0 +1,3 @@
+.col-2:hover {
+  background-color: color-mix(in srgb, var(--bs-secondary-bg-subtle) 50%, transparent) !important;
+}
